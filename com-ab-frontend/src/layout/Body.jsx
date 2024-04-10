@@ -1,23 +1,31 @@
 import { Box } from "@chakra-ui/react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import Edit from "../pages/Edit";
+import Books from "../pages/Books";
+import Login from "../pages/Login";
 
 function Body() {
 	return (
 		<Box className="App-body" minH={700}>
-			<BrowserRouter>
-				<Routes>
-					<Route
-						path="/"
-						element={<Home />}
-					/>
-					<Route
-						path="/edit"
-						element={<Edit />}
-					/>
-				</Routes>
-			</BrowserRouter>
+			<Routes>
+				<Route
+					path="/"
+					element={<Home />}
+				/>
+				<Route
+					path="/edit"
+					element={<Edit />}
+				/>
+				<Route
+					path="/books"
+					element={<Books/>}
+				/>
+				<Route
+					path="/login"
+					element={<Login/>}
+				/>
+			</Routes>
 		</Box>
 	);
 }

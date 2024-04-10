@@ -1,8 +1,8 @@
 import Header from "./layout/Header";
 import Footer from "./layout/Footer";
 import Body from "./layout/Body";
-import { Container, Image } from "@chakra-ui/react";
-
+import { Container } from "@chakra-ui/react";
+import { BrowserRouter } from "react-router-dom";
 function App() {
 	return (
 		<Container
@@ -13,9 +13,11 @@ function App() {
 			m={0}
 			p={0}
 		>
-			<Header />
-			<Body />
-			<Footer />
+			<BrowserRouter>
+				<Header />
+				<Body />
+				<Footer />
+			</BrowserRouter>
 		</Container>
 	);
 }
