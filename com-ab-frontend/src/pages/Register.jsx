@@ -4,6 +4,7 @@ import {
 	FormHelperText,
 	FormLabel,
 	VStack,
+	HStack,
 	Input,
 	Card,
 	Container,
@@ -13,23 +14,25 @@ import {
 	Text,
 	Button,
 	Link as ChakraLink,
-	HStack,
 } from "@chakra-ui/react";
 import { Link as ReactRouterLink } from "react-router-dom";
 import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
-function Login() {
+function Register() {
 	const themeColor = useColorModeValue("orange.400", "orange.300");
 
 	const [email, setEmail] = useState("");
 	const [pwd, setPwd] = useState("");
+	const [pwdConfirm, setPwdConfirm] = useState("");
 	const [emailValid, setEmailValid] = useState(false);
 
 	const validEmailReg = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
 	const [showPwd, setShowPwd] = useState(false);
+	const [showPwdConfirm, setShowPwdConfirm] = useState(false);
 	const handleShowPassword = () => setShowPwd(!showPwd);
+	const handleShowPasswordConfirm = () => setShowPwdConfirm(!showPwdConfirm);
 
 	const handleChangeEmail = (e) => {
 		if (e.target.value && e.target.value.match(validEmailReg)) {
@@ -44,7 +47,11 @@ function Login() {
 		setPwd(e.target.value);
 	};
 
-	const handleLogin = () => {
+	const handleChangePwdConfirm = (e) => {
+		setPwdConfirm(e.target.value);
+	};
+
+	const handleSignUp = () => {
 		console.log(email);
 	};
 
@@ -67,7 +74,7 @@ function Login() {
 							fontSize={24}
 							fontWeight={700}
 						>
-							Login
+							Register
 						</Text>
 						<FormControl isRequired>
 							<FormLabel>Email</FormLabel>
@@ -80,13 +87,9 @@ function Login() {
 									? { borderColor: "green.500" }
 									: { borderColor: "red.500" })}
 							/>
-							{!emailValid ? (
-								<FormHelperText color="red.500">
-									Input valid email address
-								</FormHelperText>
-							) : (
-								<></>
-							)}
+							<FormHelperText>
+								We'll never share your email.
+							</FormHelperText>
 						</FormControl>
 						<FormControl isRequired>
 							<FormLabel>Password</FormLabel>
@@ -114,25 +117,55 @@ function Login() {
 							</InputGroup>
 							<FormHelperText>
 								{/* <Link>Forgot Password</Link> */}
-								{/* Set your password strong */}
+								Set your password strong
+							</FormHelperText>
+						</FormControl>
+						<FormControl isRequired>
+							<FormLabel>Confirm Password</FormLabel>
+							<InputGroup size="md">
+								<Input
+									pr="4.5rem"
+									type={showPwd ? "text" : "password"}
+									placeholder="Enter password"
+									defaultValue={pwdConfirm}
+									onChange={handleChangePwdConfirm}
+								/>
+								<InputRightElement width="4.5rem">
+									<Button
+										h="1.75rem"
+										size="sm"
+										onClick={handleShowPasswordConfirm}
+									>
+										{showPwdConfirm ? (
+											<AiFillEye />
+										) : (
+											<AiFillEyeInvisible />
+										)}
+									</Button>
+								</InputRightElement>
+							</InputGroup>
+							<FormHelperText>
+								{/* <Link>Forgot Password</Link> */}
+								Confirm your password
 							</FormHelperText>
 						</FormControl>
 
 						<Button
 							colorScheme="orange"
 							width="100%"
-							onClick={handleLogin}
+							onClick={handleSignUp}
 						>
-							Login
+							Sign Up
 						</Button>
+
 						<HStack>
-							<Text>Don't have an account?</Text>
+							<Text>Already have an account?</Text>
 							<ChakraLink
 								as={ReactRouterLink}
-								to="/register"
+								to="/login"
 								_hover={{ color: themeColor }}
 							>
-								<Text>Register</Text>
+								<Text>Login</Text>
 							</ChakraLink>
 						</HStack>
 					</VStack>
@@ -142,4 +175,4 @@ function Login() {
 	);
 }
 
-export default Login;
+export default Register;

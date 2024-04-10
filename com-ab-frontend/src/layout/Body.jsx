@@ -4,6 +4,7 @@ import Home from "../pages/Home";
 import Edit from "../pages/Edit";
 import Books from "../pages/Books";
 import Login from "../pages/Login";
+import Register from "../pages/Register";
 
 function Body() {
 	return (
@@ -24,6 +25,10 @@ function Body() {
 				<Route
 					path="/login"
 					element={<Login/>}
+				/>
+				<Route
+					path="/register"
+					element={<Register/>}
 				/>
 			</Routes>
 		</Box>
