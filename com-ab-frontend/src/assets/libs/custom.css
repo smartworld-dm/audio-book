@@ -1,0 +1,55 @@
+/* Created manually by me */
+
+.ql-toolbar {
+    display: none;
+}
+
+#book-title {
+    border: none;
+    /* margin-bottom: 32px !important; */
+    padding: 0 !important;
+
+    font-family: 'DM Serif Display';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 44px;
+    /* color: #1D2A3B; */
+}
+
+#bookcontent {
+    height: 600px;
+    border: none;
+}
+
+#bookcontent .ql-editor {
+    overflow-y: auto;
+    /* scrollbar-width: 1px; */
+    cursor: pointer;
+    padding: 0 !important;
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 500;
+    line-height: 28px;
+}
+
+#bookcontent .ql-editor::-webkit-scrollbar{
+    width: 2px;
+    cursor: pointer;
+}
+
+#bookcontent .ql-editor::-webkit-scrollbar-thumb{
+    background-color: #F6AD55;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+#bookcontent .ql-editor::-webkit-scrollbar-track{
+    background-color: #ddd;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+#tagCanvas {
+    visibility: hidden;
+}

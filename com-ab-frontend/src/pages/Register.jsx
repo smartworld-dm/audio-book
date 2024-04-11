@@ -63,7 +63,7 @@ function Register() {
 
 	const handleSignUp = async () => {
 		
-		if (pwd.length == 0 || !emailValid || !pwdValid) {
+		if (pwd.length === 0 || !emailValid || !pwdValid) {
 			console.log("Email and password must be valid for signup");
 			return;
 		}

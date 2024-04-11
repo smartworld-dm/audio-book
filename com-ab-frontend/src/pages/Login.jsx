@@ -52,7 +52,7 @@ function Login() {
 
 	const handleLogin = async () => {
 		
-		if (pwd.length == 0 || !emailValid) {
+		if (pwd.length === 0 || !emailValid) {
 			console.log("Email and password must be valid for login");
 			return;
 		}

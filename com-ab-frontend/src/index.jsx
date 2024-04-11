@@ -2,12 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { ChakraProvider, theme, ColorModeScript } from "@chakra-ui/react";
+import { ChakraProvider, ColorModeScript, theme  } from "@chakra-ui/react";
+import "./assets/libs/quill/quill.snow.css"
+import "./assets/libs/custom.css"
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <ColorModeScript/>
+    <ColorModeScript initialColorMode='dark'/>
     <ChakraProvider theme={theme}>
       <App />
     </ChakraProvider>

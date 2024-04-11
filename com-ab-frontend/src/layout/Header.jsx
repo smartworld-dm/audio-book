@@ -1,7 +1,7 @@
+import React from "react";
 import {
 	Box,
 	HStack,
-	Heading,
 	Image,
 	Link as ChakraLink,
 	Spacer,
@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../providers/AuthProvider";
 
-function Header(props) {
+function Header() {
 	const logoColor = useColorModeValue("orange.400", "gray.50");
 	const userIcon = useColorModeValue(<FaUser />, <FaUser />);
 	const themeColor = useColorModeValue("orange.400", "orange.300");
@@ -34,7 +34,8 @@ function Header(props) {
 	return (
 		<Box
 			className="App-header"
-			p={4}
+			py={4}
+			px={20}
 		>
 			<HStack>
 				<HStack>
@@ -48,7 +49,7 @@ function Header(props) {
 						color={logoColor}
 						_hover={{ color: themeColor }}
 					>
-						<Heading>Audio Book</Heading>
+						<Text fontSize={24} fontWeight={800}>AudioBook</Text>
 					</ChakraLink>
 				</HStack>
 				<Spacer />
@@ -81,8 +82,8 @@ function Header(props) {
 							<HStack>
 								<Circle
 									bg={theme2Color}
-									w={30}
-									h={30}
+									w={'40px'}
+									h={'40px'}
 									border={"1px"}
 									borderColor={themeColor}
 								>
