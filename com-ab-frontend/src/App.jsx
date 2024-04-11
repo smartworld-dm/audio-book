@@ -3,6 +3,7 @@ import Footer from "./layout/Footer";
 import Body from "./layout/Body";
 import { Container } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
+import AuthProvider from "./providers/AuthProvider";
 function App() {
 	return (
 		<Container
@@ -14,9 +15,11 @@ function App() {
 			p={0}
 		>
 			<BrowserRouter>
-				<Header />
-				<Body />
-				<Footer />
+				<AuthProvider>
+					<Header />
+					<Body />
+					<Footer />
+				</AuthProvider>
 			</BrowserRouter>
 		</Container>
 	);

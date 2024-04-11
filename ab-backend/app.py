@@ -1,13 +1,18 @@
 from flask import Flask
 from flask import request
+from flask_cors import CORS
 import requests
 import hashlib
+import user
 
-from db import api
-from db import headers
-from db import users
+# from db import api
+# from db import headers
+# from db import users
 
 app = Flask(__name__)
+
+# CORS(app)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 @app.route("/")
 def index():
@@ -15,46 +20,21 @@ def index():
 
 @app.route("/api/login", methods=['POST'])
 def login():
-    data = request.get_json()
+    data = request.json
     email = data.get('email')
     password = data.get('password')
-    # Add your login logic here
-
-    return {"message": "Login function generated successfully"}
+    pwdHex = hashlib.md5(password.encode())
+    return user.login(email, pwdHex)
 
 @app.route("/api/register", methods=['POST'])
 def register():
     try:
-        data = request.form
+        data = request.json
         email = data.get('email')
         password = data.get('password')
         pwdHex = hashlib.md5(password.encode())
-        response = request_curl(api["url"]+"/action/insertOne", {
-            "collection": users["collection"],
-            "database": users["database"],
-            "dataSource": users["dataSource"],
-            "document": {
-                "email": email,
-                "password": pwdHex.hexdigest()
-            }
-        }, headers)
         
-        if response_status(response.status_code):
-            return {"success": True, "message": "Registered successfully"}
-        else:
-            return {"success": False, "message": "MongoDB API error"}
-    except:
-        return {"success": False, "message": "API error"}
-
-def request_curl(url, data, headers):
-    print(url)
-    print(data)
-    print(headers)
-    response = requests.post(url, json=data, headers=headers)
-    return response
-
-def response_status(status_code):
-    if status_code >= 200 and status_code < 300:
-        return True
-    
-    return False
+        return user.register(email, pwdHex)
+            
+    except Exception as e:
+        return {"success": False, "message": f'API error {str(e)}'}

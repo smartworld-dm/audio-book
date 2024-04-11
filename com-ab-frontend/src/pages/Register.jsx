@@ -14,18 +14,23 @@ import {
 	Text,
 	Button,
 	Link as ChakraLink,
+	useToast,
 } from "@chakra-ui/react";
-import { Link as ReactRouterLink } from "react-router-dom";
+import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import axios from "axios"; 
 
 function Register() {
 	const themeColor = useColorModeValue("orange.400", "orange.300");
-
+	const navigate = useNavigate();
+	const toast = useToast();
 	const [email, setEmail] = useState("");
 	const [pwd, setPwd] = useState("");
 	const [pwdConfirm, setPwdConfirm] = useState("");
+	const [pwdValid, setPwdValid] = useState(false);
 	const [emailValid, setEmailValid] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const validEmailReg = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
@@ -49,10 +54,52 @@ function Register() {
 
 	const handleChangePwdConfirm = (e) => {
 		setPwdConfirm(e.target.value);
+
+		if (pwd !== e.target.value)
+			setPwdValid(false);
+		else
+			setPwdValid(true);
 	};
 
-	const handleSignUp = () => {
-		console.log(email);
+	const handleSignUp = async () => {
+		
+		if (pwd.length == 0 || !emailValid || !pwdValid) {
+			console.log("Email and password must be valid for signup");
+			return;
+		}
+
+		const apiUrl = process.env.REACT_APP_API_URL;
+		try {
+			setIsLoading(true);
+			const response = await axios.post(`${apiUrl}register`, {
+				email,
+				password: pwd,
+			});
+
+			if (response.data.success){
+				navigate("/login");
+				toast({
+					title: 'Registration Success',
+					description: `${response.data.message}. Please login`,
+					status: 'success',
+					duration: 3000,
+					isClosable: true,
+				});
+			} else {
+				toast({
+					title: 'Registration Error',
+					description: `${response.data.message}. Please try again.`,
+					status: 'error',
+					duration: 3000,
+					isClosable: true,
+				});
+			}
+
+			setIsLoading(false);
+				
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	return (
@@ -129,6 +176,9 @@ function Register() {
 									placeholder="Enter password"
 									defaultValue={pwdConfirm}
 									onChange={handleChangePwdConfirm}
+									{...(pwdValid
+										? { borderColor: "green.500" }
+										: { borderColor: "red.500" })}
 								/>
 								<InputRightElement width="4.5rem">
 									<Button
@@ -144,16 +194,20 @@ function Register() {
 									</Button>
 								</InputRightElement>
 							</InputGroup>
-							<FormHelperText>
-								{/* <Link>Forgot Password</Link> */}
-								Confirm your password
-							</FormHelperText>
+							{!pwdValid ? (
+								<FormHelperText color="red.500">
+									Confirm your password
+								</FormHelperText>
+							) : (
+								<></>
+							)}
 						</FormControl>
 
 						<Button
 							colorScheme="orange"
 							width="100%"
 							onClick={handleSignUp}
+							isLoading={isLoading}
 						>
 							Sign Up
 						</Button>
@@ -162,7 +216,7 @@ function Register() {
 							<Text>Already have an account?</Text>
 							<ChakraLink
 								as={ReactRouterLink}
-								to="/login"
+								to="/register"
 								_hover={{ color: themeColor }}
 							>
 								<Text>Login</Text>

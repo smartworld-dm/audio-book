@@ -2,7 +2,7 @@ import { Box } from "@chakra-ui/react";
 
 function Books(){
     return(
-        <Box>
+        <Box p={4}>
             Books
         </Box>
     )

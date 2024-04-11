@@ -14,17 +14,23 @@ import {
 	Button,
 	Link as ChakraLink,
 	HStack,
+	useToast,
 } from "@chakra-ui/react";
-import { Link as ReactRouterLink } from "react-router-dom";
-import { useState } from "react";
+import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { AuthContext } from "../providers/AuthProvider";
+import axios from 'axios';
 
 function Login() {
 	const themeColor = useColorModeValue("orange.400", "orange.300");
-
+	const toast = useToast();
+    const navigate = useNavigate();
+	const {login} = useContext(AuthContext);
 	const [email, setEmail] = useState("");
 	const [pwd, setPwd] = useState("");
 	const [emailValid, setEmailValid] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const validEmailReg = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
@@ -44,8 +50,45 @@ function Login() {
 		setPwd(e.target.value);
 	};
 
-	const handleLogin = () => {
-		console.log(email);
+	const handleLogin = async () => {
+		
+		if (pwd.length == 0 || !emailValid) {
+			console.log("Email and password must be valid for login");
+			return;
+		}
+
+		const apiUrl = process.env.REACT_APP_API_URL;
+		try {
+			setIsLoading(true);
+			const response = await axios.post(`${apiUrl}login`, {
+				email,
+				password: pwd,
+			});
+
+			if (response.data.success){
+				navigate("/");
+				toast({
+					title: 'Login Success',
+					description: `${response.data.message}.`,
+					status: 'success',
+					duration: 3000,
+					isClosable: true,
+				});
+                login({email})
+			} else {
+				toast({
+					title: 'Login Error',
+					description: `${response.data.message}. Please try again.`,
+					status: 'error',
+					duration: 3000,
+					isClosable: true,
+				});
+			}
+			setIsLoading(false);
+				
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	return (
@@ -122,6 +165,7 @@ function Login() {
 							colorScheme="orange"
 							width="100%"
 							onClick={handleLogin}
+							isLoading={isLoading}
 						>
 							Login
 						</Button>
