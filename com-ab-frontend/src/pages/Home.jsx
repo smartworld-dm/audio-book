@@ -8,7 +8,7 @@ function Home() {
 	const { user } = useContext(AuthContext);
 	const navigate = useNavigate();
 	const handleGen = () => {
-		if (user && user.email) navigate("/editor");
+		if (user && user.email) navigate("/edit");
 		else navigate("/login");
 	};
 	return (

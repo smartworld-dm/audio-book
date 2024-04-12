@@ -4,6 +4,7 @@ from flask_cors import CORS
 import requests
 import hashlib
 import user
+import elevenlab
 
 # from db import api
 # from db import headers
@@ -38,3 +39,8 @@ def register():
             
     except Exception as e:
         return {"success": False, "message": f'API error {str(e)}'}
+
+@app.route("/api/voices", methods=['GET'])
+def voices():
+    voices = elevenlab.getVoices()
+    return {"success": True, "voices": voices}

@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { ChakraProvider, ColorModeScript, theme  } from "@chakra-ui/react";
+import { ChakraProvider, ColorModeScript  } from "@chakra-ui/react";
+import theme from './theming/theme';
 import "./assets/libs/quill/quill.snow.css"
 import "./assets/libs/custom.css"
 

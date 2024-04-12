@@ -24,7 +24,7 @@ function Books() {
                 <HStack>
 					<Input placeholder="Search books..." />
                     <Spacer></Spacer>
-                    <Button color={themeColor} onClick={()=>navigate("/editor")}>New Book</Button>
+                    <Button color={themeColor} onClick={()=>navigate("/edit")}>New Book</Button>
 				</HStack>
 				<Box mt={8}>
 					<List>

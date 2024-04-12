@@ -2,7 +2,7 @@ import React from "react";
 import { Box } from "@chakra-ui/react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
-import Editor from "../pages/Editor";
+import Edit from "../pages/Edit";
 import Books from "../pages/Books";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -21,8 +21,8 @@ function Body() {
 					element={<Home />}
 				/>
 				<Route
-					path="/editor"
-					element={<Editor />}
+					path="/edit"
+					element={<Edit />}
 				/>
 				<Route
 					path="/books"

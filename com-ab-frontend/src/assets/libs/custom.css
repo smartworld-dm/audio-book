@@ -33,6 +33,10 @@
     line-height: 28px;
 }
 
+.ql-container.ql-snow {
+    border: none;
+}
+
 #bookcontent .ql-editor::-webkit-scrollbar{
     width: 2px;
     cursor: pointer;
@@ -52,4 +56,14 @@
 
 #tagCanvas {
     visibility: hidden;
+}
+
+#voice-list::-webkit-scrollbar {
+    width: 2px;
+}
+
+#voice-list::-webkit-scrollbar-thumb{
+    background-color: #F6AD55;
+    border-radius: 2px;
+    cursor: pointer;
 }

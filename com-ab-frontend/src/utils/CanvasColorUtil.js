@@ -1,6 +1,6 @@
 
-const ColorUtils = {
-    generateAlphaColor: (color) =>  {
+const ColorUtils = ()=>{
+    const generateAlphaColor = (color) =>  {
         const alpha = 0.5; // Replace with your desired alpha value between 0 and 1
         const rgbaColor = "rgba(" +
             parseInt(color.slice(1, 3), 16) + ", " +
@@ -9,25 +9,30 @@ const ColorUtils = {
             alpha + ")";
 
         return rgbaColor;
-    },
-    genRandomColor: ()=> {
+    }
+
+    const genRandomColor= ()=> {
         const r = Math.floor(Math.random() * 255);
         const g = Math.floor(Math.random() * 255);
         const b = Math.floor(Math.random() * 255);
 
         // Convert the values to a hex color string
-        const color = "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+        const color = "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 
-        const rgbaColor = this.generateAlphaColor(color);
+        const rgbaColor = generateAlphaColor(color);
 
         return {
             text: color,
             background: rgbaColor
         }
-    },
-    componentToHex : (c) => {
+    }
+    const componentToHex = (c) => {
         const hex = c.toString(16);
         return hex.length === 1 ? "0" + hex : hex;
+    }
+
+    return {
+        genRandomColor
     }
 }
 
