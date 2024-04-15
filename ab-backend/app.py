@@ -44,6 +44,37 @@ def voices():
 @app.route("/api/create_book", methods=['POST'])
 def create_book():
     try:
-        return book.create_book()
+        data = request.json
+        email = data.get('email')
+        return book.create_book(email)
+    except Exception as e:
+        return {"success": False, "message": f'API error {str(e)}'}
+    
+@app.route("/api/save_book", methods=['POST'])
+def save_book():
+    try:
+        data = request.json
+        print(data)
+        _id = data.get("id")
+        email = data.get('email')
+        sections = data.get('sections')
+        return book.save_book(_id, email, sections)
+    except Exception as e:
+        return {"success": False, "message": f'API error {str(e)}'}
+    
+@app.route("/api/books", methods=['GET'])
+def get_books():
+    try:
+        user_email = request.args.get('user')
+        return book.get_books(user_email)
+    except Exception as e:
+        return {"success": False, "message": f'API error {str(e)}'}
+    
+@app.route("/api/book", methods=['GET'])
+def get_book():
+    try:
+        user_email = request.args.get('user')
+        book_id = request.args.get('id');
+        return book.get_book(id, user_email)
     except Exception as e:
         return {"success": False, "message": f'API error {str(e)}'}
