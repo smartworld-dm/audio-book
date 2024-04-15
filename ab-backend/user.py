@@ -1,7 +1,8 @@
 from db import api
 from db import headers
 from db import users
-import requests
+from util import request_curl
+from util import response_status
 
 def check_user_exists(email):
     response = request_curl(api["url"]+"/action/find", {
@@ -34,7 +35,6 @@ def check_user_auth(email, pwdHex):
             "password": pwdHex.hexdigest()
         }
     }, headers)
-    print(response.text)
     if response_status(response.status_code):
         data = response.json()
         documents = data.get('documents')
@@ -72,17 +72,3 @@ def login(email, pwdHex):
         return {"success": False, "message": "Invalid user information"}
     
     return {"success": True, "message": "Logged in successfully"}
-    
-
-def request_curl(url, data, headers):
-    print(url)
-    print(data)
-    print(headers)
-    response = requests.post(url, json=data, headers=headers)
-    return response
-
-def response_status(status_code):
-    if status_code >= 200 and status_code < 300:
-        return True
-    
-    return False

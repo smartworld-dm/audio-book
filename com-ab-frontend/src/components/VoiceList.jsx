@@ -112,7 +112,7 @@ function VoiceList() {
 						</Box>
 					))}
 			</VStack>
-			<HStack>
+			<HStack mt={4}>
 				<Button
 					size={"md"}
 					w={"full"}

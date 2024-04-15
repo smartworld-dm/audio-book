@@ -4,6 +4,7 @@ import Body from "./layout/Body";
 import { Container } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
 import AuthProvider from "./providers/AuthProvider";
+import BookContextProvider from "./providers/BookContextProvider";
 function App() {
 	return (
 		<Container
@@ -16,9 +17,11 @@ function App() {
 		>
 			<BrowserRouter>
 				<AuthProvider>
-					<Header />
-					<Body />
-					<Footer />
+					<BookContextProvider>
+						<Header />
+						<Body />
+						<Footer />
+					</BookContextProvider>
 				</AuthProvider>
 			</BrowserRouter>
 		</Container>

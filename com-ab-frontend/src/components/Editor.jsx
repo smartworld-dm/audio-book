@@ -2,7 +2,7 @@ import { Box, VStack,
 	Input,
 	useColorModeValue,
 	Button, } from "@chakra-ui/react";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import CanvasUtils from "../utils/CanvasColorUtil";
 
@@ -65,7 +65,9 @@ function Editor() {
 	}, []);
 
 	const handleChangeContent = (value) => {
-		console.log(value);
+		// handleInsertTag();
+		console.log(quillRef.current.editor.delta);
+
 	};
 
 	const handleInsertTag = () => {
@@ -88,9 +90,18 @@ function Editor() {
 		})
 	};
 
+	const handleChangeSelection = ()=>{
+		console.log(quillRef.current.selection);
+	}
+
+	const handleCharacterClick = useCallback((e)=>{
+
+	});
+
 	return (
 		<Box w={'full'}>
 			<VStack gap={4}>
+				<Button onClick={handleInsertTag}>Insert Image</Button>
 				<Input
 					placeholder="Enter your book title here"
 					border={"none"}
@@ -106,6 +117,7 @@ function Editor() {
 						onChange={handleChangeContent}
 						formats={["custom-image"]}
 						ref={reactQuillRef}
+						onChangeSelection={handleChangeSelection}
 					/>
 				</Box>
 				<canvas

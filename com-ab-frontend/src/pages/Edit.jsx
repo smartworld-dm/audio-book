@@ -14,7 +14,7 @@ function Edit() {
 
 	return (
 		<Box
-			// px={10}
+			px={5}
 			// border={"1px"}
 			// borderLeft={"none"}
 			// borderRight={"none"}
@@ -36,7 +36,7 @@ function Edit() {
 					borderColor={themeColor}
 					// pl={10}
 				>
-					<EditorSidebar/>
+					<EditorSidebar />
 				</GridItem>
 				<GridItem
 					colSpan={7}

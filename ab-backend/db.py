@@ -16,8 +16,8 @@ users = {
     "dataSource": "Cluster0"
 }
 
-projects = {
-    "collection" : "projects",
+books = {
+    "collection" : "books",
     "database": "audio-book",
     "dataSource": "Cluster0"
 }

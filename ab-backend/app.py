@@ -1,14 +1,10 @@
 from flask import Flask
 from flask import request
 from flask_cors import CORS
-import requests
 import hashlib
 import user
 import elevenlab
-
-# from db import api
-# from db import headers
-# from db import users
+import book
 
 app = Flask(__name__)
 
@@ -44,3 +40,10 @@ def register():
 def voices():
     voices = elevenlab.getVoices()
     return {"success": True, "voices": voices}
+
+@app.route("/api/create_book", methods=['POST'])
+def create_book():
+    try:
+        return book.create_book()
+    except Exception as e:
+        return {"success": False, "message": f'API error {str(e)}'}
