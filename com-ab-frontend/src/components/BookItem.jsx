@@ -4,18 +4,21 @@ import {
 	Card,
 	HStack,
 	Text,
-	Button,
 	Spacer,
 	ButtonGroup,
 	IconButton,
 	Link,
 } from "@chakra-ui/react";
-import { FaDownload, FaBookOpen, FaEdit, FaTrash } from "react-icons/fa";
+import { FaDownload, FaEdit, FaTrash } from "react-icons/fa";
 import { useColorModeValue } from "@chakra-ui/react";
+import { useContext } from "react";
+import { BookContext } from "../providers/BookContextProvider";
 function BookItem(props) {
 	const bookTitleColor = useColorModeValue("gray.600", "gray.200");
+	const {onReset, onOpenBook} = useContext(BookContext);
 	const handleOpenBook = () => {
-		console.log("aaa");
+		onReset();
+		onOpenBook(props.book);
 	};
 	return (
 		<ListItem mb={4}>

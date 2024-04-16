@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
 	Box,
 	HStack,
@@ -26,15 +26,19 @@ import {
 import axios from "axios";
 import { FaTrash, FaEdit, FaPlay } from "react-icons/fa";
 import { ColorUtils } from "../utils/CanvasColorUtil";
+import { BookContext } from "../providers/BookContextProvider";
 
 function VoiceList() {
 	const [voices, setVoices] = useState([]);
-	const [characters, setCharacters] = useState([]);
-	const [voiceIdx, setVoiceIdx] = useState("0");
+	const { characters, setCharacters } = useContext(BookContext);
 	const [isLoading, setIsLoading] = useState(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [newName, setNewName] = useState("");
 	const { genRandomColor } = ColorUtils();
+	const [isNew, setIsNew] = useState(true);
+	const [voiceListIdx, setVoiceListIdx] = useState("0");
+	const [editingCharacterIdx, setEditingCharacterIdx] = useState(0);
+
 	useEffect(() => {
 		if (!isLoading) loadVoices();
 	}, []);
@@ -46,7 +50,6 @@ function VoiceList() {
 		axios
 			.get(`${apiUrl}voices`)
 			.then((response) => {
-				console.log(response.data.success);
 				if (response.data.success) {
 					setVoices(response.data.voices);
 				} else {
@@ -59,7 +62,7 @@ function VoiceList() {
 
 	const handleVoiceSelect = (e) => {
 		console.log(e);
-		setVoiceIdx(e);
+		setVoiceListIdx(e);
 	};
 
 	const handleCheckVoice = (voiceId) => {
@@ -68,20 +71,52 @@ function VoiceList() {
 		audio.play();
 	};
 
-	const handleAddCharacter = () => {
-		// Add character logic here
-		const voice = voices[voiceIdx];
-		const new_characters = [...characters];
-		new_characters.push({
-			name: newName,
-			voice_id: voice.voice_id,
-			voice_name: voice.name,
-			voice_url: voice.preview_url,
-			tag_color: genRandomColor(),
-		});
-		setCharacters(new_characters);
+	const handleSaveCharacter = () => {
+		if (isNew) {
+			// Add character logic here
+			const voice = voices[voiceListIdx];
+			const newCharacters = [...characters];
+			newCharacters.push({
+				name: newName,
+				voice_id: voice.voice_id,
+				voice_name: voice.name,
+				voice_url: voice.preview_url,
+				tag_color: genRandomColor(),
+			});
+			setCharacters(newCharacters);
 
-		onClose();
+			onClose();
+		} else {
+			const voice = voices[voiceListIdx];
+
+			const newCharacter = characters[editingCharacterIdx];
+			const newCharacters = [...characters];
+			newCharacters[editingCharacterIdx] = {
+				...newCharacter,
+				name: newName,
+				voice_id: voice.voice_id,
+				voice_name: voice.name,
+				voice_url: voice.preview_url,
+			};
+			setCharacters(newCharacters);
+
+			onClose();
+		}
+	};
+
+	const handleRemoveCharacter = () => {
+		// Remove from list
+		// Remove from book
+	};
+
+	const handleEditCharacter = (characterIdx) => {
+		setIsNew(false);
+		onOpen();
+
+		const character = characters[characterIdx];
+		console.log(character);
+		// setSelectedVoiceIdx(`${character["voice_id"]}`);
+		setNewName(character["name"]);
 	};
 
 	return (
@@ -103,10 +138,12 @@ function VoiceList() {
 								<IconButton
 									icon={<FaTrash />}
 									size={"xs"}
+									onClick={handleRemoveCharacter}
 								/>
 								<IconButton
 									icon={<FaEdit />}
 									size={"xs"}
+									onClick={() => handleEditCharacter(index)}
 								/>
 							</HStack>
 						</Box>
@@ -117,7 +154,11 @@ function VoiceList() {
 					size={"md"}
 					w={"full"}
 					colorScheme="orange"
-					onClick={onOpen}
+					onClick={() => {
+						setNewName("");
+						setIsNew(true);
+						onOpen();
+					}}
 				>
 					Add New Character
 				</Button>
@@ -129,7 +170,7 @@ function VoiceList() {
 			>
 				<ModalOverlay />
 				<ModalContent>
-					<ModalHeader>Add Character</ModalHeader>
+					<ModalHeader>Voice & Character</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody>
 						<VStack
@@ -147,7 +188,7 @@ function VoiceList() {
 								<FormLabel>Character Voice</FormLabel>
 								<RadioGroup
 									onChange={handleVoiceSelect}
-									value={voiceIdx}
+									value={voiceListIdx}
 									w={"full"}
 								>
 									<Stack
@@ -191,9 +232,9 @@ function VoiceList() {
 					<ModalFooter>
 						<Button
 							colorScheme="orange"
-							onClick={handleAddCharacter}
+							onClick={handleSaveCharacter}
 						>
-							OK
+							Save
 						</Button>
 						<Spacer />
 						<Button onClick={onClose}>Close</Button>

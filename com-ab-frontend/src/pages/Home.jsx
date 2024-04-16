@@ -1,20 +1,17 @@
-import React, { useState } from "react";
-import { Box, VStack, Text, Image, Button, useToast } from "@chakra-ui/react";
+import React from "react";
+import { Box, VStack, Text, Image, Button } from "@chakra-ui/react";
 import audiobook from "../assets/imgs/audiobook.webp";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../providers/AuthProvider";
-import axios from "axios";
 import { BookContext } from "../providers/BookContextProvider";
 function Home() {
 	const { user } = useContext(AuthContext);
-	const { setBookIdx, onNewBook } = useContext(BookContext);
-	const toast = useToast();
+	const { onNewBook, isLoading } = useContext(BookContext);
 	const navigate = useNavigate();
-	const [newBookCreating, setNewBookCreating] = useState(false);
 	const handleNewBook = () => {
 		if (user && user.email) {
-			onNewBook(setNewBookCreating);
+			onNewBook();
 		} else navigate("/login");
 	};
 	return (
@@ -30,7 +27,7 @@ function Home() {
 				<Button
 					colorScheme="orange"
 					onClick={handleNewBook}
-					isLoading={newBookCreating}
+					isLoading={isLoading}
 				>
 					Get Started
 				</Button>

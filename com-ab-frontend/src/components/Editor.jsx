@@ -1,10 +1,15 @@
-import { Box, VStack,
-	Input,
-	useColorModeValue,
-	Button, } from "@chakra-ui/react";
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import { Box, VStack, Input, Text, Button } from "@chakra-ui/react";
+import React, {
+	useEffect,
+	useState,
+	useRef,
+	useCallback,
+	useContext,
+} from "react";
 import ReactQuill, { Quill } from "react-quill";
 import CanvasUtils from "../utils/CanvasColorUtil";
+import { BookContext } from "../providers/BookContextProvider";
+import { EditContext } from "../providers/EditContextProvider";
 
 const ImageBlot = Quill.import("formats/image");
 class CustomImageBlot extends ImageBlot {
@@ -33,7 +38,6 @@ Quill.debug("debug");
 Quill.register({
 	"formats/custom-image": CustomImageBlot,
 });
-console.log("Image");
 
 function Editor() {
 	// Quill Editor Related States
@@ -45,6 +49,15 @@ function Editor() {
 	const [defaultCanvasHeight, setDefaultCanvasHeight] = useState();
 	const [defaultCanvasWidth, setDefaultCanvasWidth] = useState();
 	const [canvasCtx, setCanvasCtx] = useState(null);
+	const {
+		currentBookTitle,
+		setCurrentBookTitle,
+		getCurrentSectionTitle,
+		sections,
+		setSections,
+	} = useContext(BookContext);
+
+	const { currentSectionId } = useContext(EditContext);
 
 	useEffect(() => {
 		// QuillRef
@@ -65,9 +78,13 @@ function Editor() {
 	}, []);
 
 	const handleChangeContent = (value) => {
-		// handleInsertTag();
-		console.log(quillRef.current.editor.delta);
-
+		console.log(value);
+		const ops = quillRef.current.editor.delta["ops"];
+		const newSections = [...sections];
+		newSections[currentSectionId]["content"] = {
+			ops,
+		};
+		setSections(newSections);
 	};
 
 	const handleInsertTag = () => {
@@ -86,34 +103,48 @@ function Editor() {
 			alt: "sdsdsdsdsd",
 			width: 110,
 			height: 22,
-			character: '1',
-		})
+			character: "1",
+		});
 	};
 
-	const handleChangeSelection = ()=>{
-		console.log(quillRef.current.selection);
-	}
+	const handleChangeSelection = () => {
+		// console.log(quillRef.current.selection);
+	};
 
-	const handleCharacterClick = useCallback((e)=>{
+	const handleCharacterClick = useCallback((e) => {});
 
-	});
+	useEffect(() => {
+		// const content = sections[currentSectionId];
+		console.log(sections);
+		if (sections.length > 0) {
+			const section = sections[currentSectionId];
+			quillRef.current.setContents(section['content']);
+		}
+	}, [currentSectionId]);
 
 	return (
-		<Box w={'full'}>
-			<VStack gap={4}>
+		<Box
+			w={"full"}
+			pr={4}
+		>
+			<VStack
+				gap={4}
+				align={"start"}
+			>
 				<Button onClick={handleInsertTag}>Insert Image</Button>
 				<Input
 					placeholder="Enter your book title here"
 					border={"none"}
 					fontSize={18}
 					id="book-title"
+					defaultValue={currentBookTitle}
+					onChange={(e) => setCurrentBookTitle(e.target.value)}
 				/>
-				{/* <Button onClick={() => handleInsertTag()}> insert</Button> */}
+				<Text>{getCurrentSectionTitle(currentSectionId)}</Text>
 				<Box w={"full"}>
 					<ReactQuill
 						id="bookcontent"
 						theme="snow"
-						// value={value}
 						onChange={handleChangeContent}
 						formats={["custom-image"]}
 						ref={reactQuillRef}

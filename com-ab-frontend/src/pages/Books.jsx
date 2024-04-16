@@ -6,46 +6,40 @@ import {
 	List,
 	HStack,
 	Spacer,
-	Button,
-	useToast,
-	Container,
+	Button
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@chakra-ui/react";
 import BookItem from "../components/BookItem";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { AuthContext } from "../providers/AuthProvider";
 import { BookContext } from "../providers/BookContextProvider";
 function Books() {
 	const themeColor = useColorModeValue("orange.400", "orange.300");
-	const { setBookIdx, onNewBook } = useContext(BookContext);
+	const { onNewBook, onLoadBooks, onReset, isLoading } = useContext(BookContext);
 	const navigate = useNavigate();
 	const [loaded, setLoaded] = useState(false);
-	const [newBookCreating, setNewBookCreating] = useState(false);
 	const [books, setBooks] = useState([]);
-	const toast = useToast();
 	const { user } = useContext(AuthContext);
 
 	const loadBooks = () => {
 		setLoaded(true);
-		const apiUrl = process.env.REACT_APP_API_URL;
-		axios
-			.get(`${apiUrl}books?user=${user.email}`)
-			.then((response) => {
-				if (response.data.success) {
-					setBooks(response.data.data.documents);
-					console.log(response.data.data.documents);
-				} else {
-					setBooks([]);
-				}
-			})
-			.catch((e) => console.log(e))
-			.finally(() => setLoaded(false));
+		onReset();
+		onLoadBooks().then((response) => {
+			if (response.data.success) {
+				setBooks(response.data.data.documents);
+				console.log(response.data.data.documents);
+			} else {
+				setBooks([]);
+			}
+		})
+		.catch((e) => console.log(e))
+		.finally(() => setLoaded(false));
 	};
 
 	const handleNewBook = () => {
+		onReset();
 		if (user && user.email) {
-			onNewBook(setNewBookCreating);
+			onNewBook();
 		} else navigate("/login");
 	};
 
@@ -68,7 +62,7 @@ function Books() {
 						<Spacer></Spacer>
 						<Button
 							color={themeColor}
-							isLoading={newBookCreating}
+							isLoading={isLoading}
 							onClick={handleNewBook}
 						>
 							New Book

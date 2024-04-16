@@ -19,12 +19,14 @@
 
 #bookcontent {
     height: 600px;
-    border: none;
+    border: 1px solid;
+    padding: 1.25rem;
+    border-radius: 0.5rem;
+    border-color: #A0AEC0;
 }
 
 #bookcontent .ql-editor {
     overflow-y: auto;
-    /* scrollbar-width: 1px; */
     cursor: pointer;
     padding: 0 !important;
     font-family: 'Lato';

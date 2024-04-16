@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import {
 	Box,
 	Button,
-	HStack,
 	Input,
 	VStack,
 	Modal,
@@ -14,24 +13,39 @@ import {
 	ModalOverlay,
 	ModalFooter,
 	Spacer,
-	Card,
-	CardHeader,
-	IconButton,
-	Text,
 } from "@chakra-ui/react";
 import { BookContext } from "../providers/BookContextProvider";
-import { FaBookOpen, FaEdit, FaSave } from "react-icons/fa";
 
-function Sections(props) {
+import SectionItem from "./SectionItem";
+import { EditContext } from "../providers/EditContextProvider";
+
+function Sections() {
 	const fileInputRef = React.useRef(null);
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const { sections, setSections } = useContext(BookContext);
-	const [sectionTitle, setSectionTitle] = useState("");
-	const [modifyTitle, setModifyTitle] = useState("");
-	const [isModifyingTitle, setIsModifyingTitle] = useState(false);
-	const [currentSectionId, setCurrentSectionId] = useState(0);
+	const [newSectionTitle, setNewSectionTitle] = useState("");
+	const { sections, setSections, onSaveBook, isLoading } =
+		useContext(BookContext);
+
+	const {currentSectionId, setCurrentSectionId} = useContext(EditContext);
+
 	const openNewSectionModal = () => {
 		onOpen();
+	};
+
+	const onSaveSection = () => {
+		const newSections = [...sections];
+		if (newSectionTitle.length !== 0) {
+			newSections.push({
+				title: newSectionTitle,
+			});
+		} else {
+			newSections[currentSectionId] = {
+				...newSections[currentSectionId],
+				title: newSectionTitle,
+			};
+		}
+		setSections(newSections);
+		onClose();
 	};
 
 	const handleOpenFile = () => {
@@ -47,48 +61,22 @@ function Sections(props) {
 		}
 		const reader = new FileReader();
 		reader.onload = async (e) => {
-			const content = e.target.result;
+			// const content = e.target.result;
 		};
 		reader.readAsText(file);
 	};
 
-	const onSaveSection = () => {
-		const newSections = [...sections];
-		if (sectionTitle.length !== 0) {
-			newSections.push({
-				title: sectionTitle,
-			});
-		} else {
-			newSections[currentSectionId] = {
-				...newSections[currentSectionId],
-				title: sectionTitle,
-			};
-		}
-		setSections(newSections);
-		onClose();
-	};
-
-	const onEditTitle = () => {
-		const newSections = [...sections];
-		newSections[currentSectionId] = {
-			...newSections[currentSectionId],
-			title: modifyTitle,
-		};
-		setSectionTitle(modifyTitle);
-		setSections(newSections);
-	};
-
 	const handleSaveBook = () => {
-		props.saveBook();
-		// console.log(sections)
+		onSaveBook();
 	};
 
-	const handleModifyTitle = () => {
-		setIsModifyingTitle(true);
+	const handleSelectSection = (_sectionId) => {
+		setCurrentSectionId(_sectionId);
 	};
 
 	useEffect(() => {
 		if (sections.length > 0) {
+			// console.log(sections);
 		}
 	}, [sections]);
 
@@ -100,55 +88,16 @@ function Sections(props) {
 						w={"full"}
 						align={"start"}
 					>
-						{sections.map((section, index) => (
-							<Card
-								key={index}
-								w={"full"}
-							>
-								<CardHeader>
-									<HStack gap={4}>
-										{!isModifyingTitle && (
-											<Text>{section.title}</Text>
-										)}
-										{isModifyingTitle && (
-											<Input
-												onChange={(e) =>
-													setModifyTitle(
-														e.target.value
-													)
-												}
-												defaultValue={section.title}
-											/>
-										)}
-										<Spacer />
-
-										{!isModifyingTitle && (
-											<IconButton
-												size={"sm"}
-												icon={<FaEdit />}
-												onClick={handleModifyTitle}
-											/>
-										)}
-										{isModifyingTitle && (
-											<IconButton
-												size={"sm"}
-												icon={<FaSave />}
-												onClick={() => {
-													onEditTitle();
-													setIsModifyingTitle(false);
-												}}
-											/>
-										)}
-
-										<IconButton
-											size={"sm"}
-											icon={<FaBookOpen />}
-										/>
-									</HStack>
-								</CardHeader>
-								{/* <CardBody></CardBody> */}
-							</Card>
-						))}
+						{sections &&
+							sections.map((section, index) => (
+								<SectionItem
+									key={index}
+									id={index}
+									section={section}
+									onSelect={handleSelectSection}
+									current={currentSectionId}
+								/>
+							))}
 
 						<Button
 							colorScheme="orange"
@@ -163,12 +112,13 @@ function Sections(props) {
 							onClick={handleSaveBook}
 							w={"full"}
 							mt={8}
+							isLoading={isLoading}
 						>
 							Save Book
 						</Button>
 					</VStack>
 				) : (
-					<VStack w={'full'}>
+					<VStack w={"full"}>
 						<Button
 							colorScheme="orange"
 							onClick={openNewSectionModal}
@@ -204,7 +154,7 @@ function Sections(props) {
 					<ModalBody>
 						<Input
 							placeholder="Input new section title"
-							onChange={(e) => setSectionTitle(e.target.value)}
+							onChange={(e) => setNewSectionTitle(e.target.value)}
 						/>
 					</ModalBody>
 					<ModalFooter>

@@ -17,11 +17,13 @@ import { useNavigate } from "react-router-dom";
 export const BookContext = createContext();
 const apiUrl = process.env.REACT_APP_API_URL;
 const BookContextProvider = ({ children }) => {
-	const [bookIdx, setBookIdx] = useState(); // Currently Editing book idx
+	const [currentBookIdx, setCurrentBookIdx] = useState(); // Currently Editing book idx
+	const [currentBookTitle, setCurrentBookTitle] = useState(""); // Currently Editing Book Title
 	const [sections, setSections] = useState([]); // Currently Editing book sections
+	const [characters, setCharacters] = useState([]);
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [isSaving, setIsSaving] = useState(false);
-	const {user} = useContext(AuthContext);
+	const [isLoading, setIsLoading] = useState(false);
+	const { user } = useContext(AuthContext);
 	const toast = useToast();
 	const navigate = useNavigate();
 
@@ -33,22 +35,61 @@ const BookContextProvider = ({ children }) => {
 	};
 
 	const onReset = () => {
-		setBookIdx("");
+		setIsLoading(false);
+		setCurrentBookIdx("");
+		setCurrentBookTitle("");
 		setSections([]);
+	};
+
+	const onOpenBook = (book) => {
+		try {
+			setIsLoading(true);
+			axios
+				.get(`${apiUrl}book?user=${user.email}&id=${book._id}`)
+				.then((response) => {
+					if (response.data.success) {
+						toast({
+							title: "Load Book",
+							description: `${response.data.message}.`,
+							status: "success",
+							duration: 3000,
+							isClosable: true,
+						});
+						setCurrentBookIdx(response.data.data._id);
+						setSections(JSON.parse(response.data.data.sections));
+						setCurrentBookTitle(response.data.data.title);
+						navigate("/edit");
+					} else {
+						toast({
+							title: "Load Book",
+							description: `${response.data.message}.`,
+							status: "error",
+							duration: 3000,
+							isClosable: true,
+						});
+					}
+				})
+				.catch((e) => console.log(e))
+				.finally(() => {
+					setIsLoading(false);
+				});
+		} catch {
+			setIsLoading(false);
+		}
 	};
 
 	const onSaveBook = () => {
 		try {
-			setIsSaving(true);
+			setIsLoading(true);
 			axios
 				.post(`${apiUrl}save_book`, {
 					email: user.email,
-					id: bookIdx,
-					sections: JSON.stringify(sections)
+					id: currentBookIdx,
+					title: currentBookTitle,
+					sections: JSON.stringify(sections),
 				})
 				.then((response) => {
 					if (response.data.success) {
-
 						toast({
 							title: "Save Book",
 							description: `${response.data.message}.`,
@@ -67,15 +108,17 @@ const BookContextProvider = ({ children }) => {
 					}
 				})
 				.catch((e) => console.log(e))
-				.finally(() => {});
+				.finally(() => {
+					setIsLoading(false);
+				});
 		} catch {
-
+			setIsLoading(false);
 		}
 	};
 
-	const onNewBook = (setNewBookCreating) => {
+	const onNewBook = () => {
 		try {
-			setNewBookCreating(true);
+			setIsLoading(true);
 			axios
 				.post(`${apiUrl}create_book`, {
 					email: user.email,
@@ -83,7 +126,8 @@ const BookContextProvider = ({ children }) => {
 				.then((response) => {
 					if (response.data.success) {
 						console.log(response.data);
-						setBookIdx(response.data.data);
+						setCurrentBookIdx(response.data.data);
+						setCurrentBookTitle("Untitled");
 
 						toast({
 							title: "Create Book",
@@ -104,25 +148,47 @@ const BookContextProvider = ({ children }) => {
 					}
 				})
 				.catch((e) => console.log(e))
-				.finally(() => {});
-		} catch {}
+				.finally(() => {
+					setIsLoading(false);
+				});
+		} catch {
+			setIsLoading(false);
+		}
 	};
 
-	const onGetBook = () => {
+	const onLoadBooks = async () => {
+		return axios.get(`${apiUrl}books?user=${user.email}`);
+	};
 
+	const getCurrentSectionTitle = (sectionId)=> {
+		if (sections.length > 0) {
+			return sections[sectionId]['title']
+		}
+
+		return "";
 	}
 
 	return (
 		<BookContext.Provider
 			value={{
-				setBookIdx,
+				isLoading,
+				setCurrentBookIdx,
 				sections,
 				setSections,
+				currentBookTitle,
+				setCurrentBookTitle,
+				characters,
+				setCharacters,
+
 				onLoading,
 				onLoaded,
 				onReset,
 				onSaveBook,
-				onNewBook
+				onNewBook,
+				onOpenBook,
+				onLoadBooks,
+
+				getCurrentSectionTitle
 			}}
 		>
 			{children}
@@ -135,7 +201,7 @@ const BookContextProvider = ({ children }) => {
 				<ModalContent>
 					<ModalHeader>Loading</ModalHeader>
 					<ModalCloseButton />
-					<ModalBody>bookIdx</ModalBody>
+					<ModalBody>Now loading</ModalBody>
 					<ModalFooter>
 						<Button onClick={onClose}>Close</Button>
 					</ModalFooter>

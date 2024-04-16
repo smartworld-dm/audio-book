@@ -54,11 +54,11 @@ def create_book():
 def save_book():
     try:
         data = request.json
-        print(data)
         _id = data.get("id")
+        title = data.get("title")
         email = data.get('email')
         sections = data.get('sections')
-        return book.save_book(_id, email, sections)
+        return book.save_book(_id, title, email, sections)
     except Exception as e:
         return {"success": False, "message": f'API error {str(e)}'}
     
@@ -74,7 +74,7 @@ def get_books():
 def get_book():
     try:
         user_email = request.args.get('user')
-        book_id = request.args.get('id');
-        return book.get_book(id, user_email)
+        _id = request.args.get('id');
+        return book.get_book(_id, user_email)
     except Exception as e:
         return {"success": False, "message": f'API error {str(e)}'}

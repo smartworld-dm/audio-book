@@ -3,7 +3,6 @@ from db import headers
 from db import books
 from util import request_curl
 from util import response_status
-from bson import ObjectId
 
 def create_book(email):
     response = request_curl(api["url"]+"/action/insertOne", {
@@ -23,7 +22,7 @@ def create_book(email):
     else:
         return {"success": False, "message": "MongoDB API error"}
     
-def save_book(_id, email, sections):
+def save_book(_id, title, email, sections):
     filter = {
         "_id": {"$oid": _id},
         "email": email
@@ -35,7 +34,8 @@ def save_book(_id, email, sections):
         "filter": filter,
         "update": {
             "$set": {
-                "sections": sections
+                "sections": sections,
+                "title": title,
             }
         }
     }, headers)
@@ -68,9 +68,9 @@ def get_books(email):
         return {"success": False, "message": "MongoDB API error"}
 
 
-def get_book(id, email):
+def get_book(_id, email):
     filter = {
-        "_id": id,
+        "_id": {"$oid": _id},
         "email": email
     }
     response = request_curl(api["url"]+"/action/findOne", {
@@ -79,10 +79,9 @@ def get_book(id, email):
         "dataSource": books["dataSource"],
         "filter": filter,
     }, headers)
-    
     if response_status(response.status_code):
         data = response.json()
-        return {"success": True, "message": "Get this book successfully", "data": data}
+        return {"success": True, "message": "Get this book successfully", "data": data["document"]}
     else:
         return {"success": False, "message": "MongoDB API error"}
 
