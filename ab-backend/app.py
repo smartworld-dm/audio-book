@@ -58,7 +58,8 @@ def save_book():
         title = data.get("title")
         email = data.get('email')
         sections = data.get('sections')
-        return book.save_book(_id, title, email, sections)
+        characters = data.get('characters')
+        return book.save_book(_id, title, email, sections, characters)
     except Exception as e:
         return {"success": False, "message": f'API error {str(e)}'}
     

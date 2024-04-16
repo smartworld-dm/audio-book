@@ -15,29 +15,42 @@ import {
 	ModalContent,
 	ModalCloseButton,
 	ModalOverlay,
-	SimpleGrid,
+	Text,
 	Radio,
 	RadioGroup,
 	FormControl,
 	FormLabel,
 	Input,
 	Stack,
+	ButtonGroup,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { FaTrash, FaEdit, FaPlay } from "react-icons/fa";
 import { ColorUtils } from "../utils/CanvasColorUtil";
 import { BookContext } from "../providers/BookContextProvider";
+import { EditContext } from "../providers/EditContextProvider";
 
 function VoiceList() {
 	const [voices, setVoices] = useState([]);
 	const { characters, setCharacters } = useContext(BookContext);
 	const [isLoading, setIsLoading] = useState(false);
-	const { isOpen, onOpen, onClose } = useDisclosure();
+	const {
+		isOpen: isVoiceOpen,
+		onOpen: onVoiceOpen,
+		onClose: onVoiceClose,
+	} = useDisclosure();
+	const {
+		isOpen: isCharacterRemoveOpen,
+		onOpen: onCharacterRemoveOpen,
+		onClose: onCharacterRemoveClose,
+	} = useDisclosure();
 	const [newName, setNewName] = useState("");
 	const { genRandomColor } = ColorUtils();
 	const [isNew, setIsNew] = useState(true);
 	const [voiceListIdx, setVoiceListIdx] = useState("0");
 	const [editingCharacterIdx, setEditingCharacterIdx] = useState(0);
+	const [removingCharacterIdx, setRemovingCharacterIdx] = useState(0);
+	const { onInsertTag, onRemoveTag } = useContext(EditContext);
 
 	useEffect(() => {
 		if (!isLoading) loadVoices();
@@ -52,6 +65,18 @@ function VoiceList() {
 			.then((response) => {
 				if (response.data.success) {
 					setVoices(response.data.voices);
+					if (characters.length == 0) {
+						const newCharacters = [];
+						const voice = response.data.voices[0];
+						newCharacters.push({
+							name: "Default",
+							voice_id: voice.voice_id,
+							voice_name: voice.name,
+							voice_url: voice.preview_url,
+							tag_color: genRandomColor(),
+						});
+						setCharacters(newCharacters);
+					}
 				} else {
 					setVoices([]);
 				}
@@ -61,7 +86,6 @@ function VoiceList() {
 	};
 
 	const handleVoiceSelect = (e) => {
-		console.log(e);
 		setVoiceListIdx(e);
 	};
 
@@ -75,7 +99,9 @@ function VoiceList() {
 		if (isNew) {
 			// Add character logic here
 			const voice = voices[voiceListIdx];
-			const newCharacters = [...characters];
+
+			const newCharacters =
+				characters.length === 0 ? [] : [...characters];
 			newCharacters.push({
 				name: newName,
 				voice_id: voice.voice_id,
@@ -85,7 +111,7 @@ function VoiceList() {
 			});
 			setCharacters(newCharacters);
 
-			onClose();
+			onVoiceClose();
 		} else {
 			const voice = voices[voiceListIdx];
 
@@ -99,24 +125,41 @@ function VoiceList() {
 				voice_url: voice.preview_url,
 			};
 			setCharacters(newCharacters);
-
-			onClose();
+			onVoiceClose();
 		}
-	};
-
-	const handleRemoveCharacter = () => {
-		// Remove from list
-		// Remove from book
 	};
 
 	const handleEditCharacter = (characterIdx) => {
 		setIsNew(false);
-		onOpen();
+		setEditingCharacterIdx(characterIdx);
+		onVoiceOpen();
 
 		const character = characters[characterIdx];
-		console.log(character);
-		// setSelectedVoiceIdx(`${character["voice_id"]}`);
 		setNewName(character["name"]);
+		voices.map((voice, idx) => {
+			if (voice.voice_id === character["voice_id"]) {
+				setVoiceListIdx(`${idx}`);
+			}
+		});
+	};
+
+	const handleClickTag = (character, idx) => {
+		onInsertTag(character, idx);
+	};
+
+	const handleRemoveCharacter = (characterIdx) => {
+		// Remove from list
+		// Remove from book
+		setRemovingCharacterIdx(characterIdx);
+		onCharacterRemoveOpen();
+	};
+
+	const removeTag = () => {
+		onRemoveTag(removingCharacterIdx);
+		const newCharacters = [...characters];
+		newCharacters.splice(removingCharacterIdx, 1);
+		setCharacters(newCharacters);
+		onCharacterRemoveClose();
 	};
 
 	return (
@@ -133,13 +176,27 @@ function VoiceList() {
 							w={"full"}
 						>
 							<HStack gap={4}>
-								<Tag>{character.name}</Tag>
+								<Tag
+									bg={character.tag_color.background}
+									onClick={() =>
+										handleClickTag(character, index)
+									}
+								>
+									<Text color={character.tag_color.text}>
+										{character.name}
+									</Text>
+								</Tag>
 								<Spacer />
-								<IconButton
-									icon={<FaTrash />}
-									size={"xs"}
-									onClick={handleRemoveCharacter}
-								/>
+								{index !== 0 && (
+									<IconButton
+										icon={<FaTrash />}
+										size={"xs"}
+										onClick={() =>
+											handleRemoveCharacter(index)
+										}
+									/>
+								)}
+
 								<IconButton
 									icon={<FaEdit />}
 									size={"xs"}
@@ -157,15 +214,44 @@ function VoiceList() {
 					onClick={() => {
 						setNewName("");
 						setIsNew(true);
-						onOpen();
+						onVoiceOpen();
 					}}
 				>
 					Add New Character
 				</Button>
 			</HStack>
 			<Modal
-				onClose={onClose}
-				isOpen={isOpen}
+				onClose={onCharacterRemoveClose}
+				isOpen={isCharacterRemoveOpen}
+				isCentered
+			>
+				<ModalOverlay />
+				<ModalContent>
+					<ModalHeader>Remove Character</ModalHeader>
+					<ModalCloseButton />
+					<ModalBody>
+						<Text>
+							Are you sure you want to remove this character?
+						</Text>
+					</ModalBody>
+					<ModalFooter>
+						<ButtonGroup>
+							<Button
+								colorScheme="red"
+								onClick={removeTag}
+							>
+								Sure
+							</Button>
+							<Button onClick={onCharacterRemoveClose}>
+								Close
+							</Button>
+						</ButtonGroup>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+			<Modal
+				onClose={onVoiceClose}
+				isOpen={isVoiceOpen}
 				isCentered
 			>
 				<ModalOverlay />
@@ -210,6 +296,7 @@ function VoiceList() {
 														colorScheme="orange"
 													>
 														{voice.name}
+														{/* ({voice.voice_id}) */}
 													</Radio>
 													<Spacer />
 													<IconButton
@@ -237,7 +324,7 @@ function VoiceList() {
 							Save
 						</Button>
 						<Spacer />
-						<Button onClick={onClose}>Close</Button>
+						<Button onClick={onVoiceClose}>Close</Button>
 					</ModalFooter>
 				</ModalContent>
 			</Modal>

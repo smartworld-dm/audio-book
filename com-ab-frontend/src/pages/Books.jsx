@@ -6,7 +6,9 @@ import {
 	List,
 	HStack,
 	Spacer,
-	Button
+	Button,
+	Spinner,
+	Center,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@chakra-ui/react";
 import BookItem from "../components/BookItem";
@@ -15,25 +17,31 @@ import { AuthContext } from "../providers/AuthProvider";
 import { BookContext } from "../providers/BookContextProvider";
 function Books() {
 	const themeColor = useColorModeValue("orange.400", "orange.300");
-	const { onNewBook, onLoadBooks, onReset, isLoading } = useContext(BookContext);
+	const { onNewBook, onLoadBooks, onReset, isLoading } =
+		useContext(BookContext);
 	const navigate = useNavigate();
+	const [isBooksLoading, setIsBooksLoading] = useState(false);
 	const [loaded, setLoaded] = useState(false);
 	const [books, setBooks] = useState([]);
 	const { user } = useContext(AuthContext);
 
 	const loadBooks = () => {
+		setIsBooksLoading(true);
 		setLoaded(true);
 		onReset();
-		onLoadBooks().then((response) => {
-			if (response.data.success) {
-				setBooks(response.data.data.documents);
-				console.log(response.data.data.documents);
-			} else {
-				setBooks([]);
-			}
-		})
-		.catch((e) => console.log(e))
-		.finally(() => setLoaded(false));
+		onLoadBooks()
+			.then((response) => {
+				if (response.data.success) {
+					setBooks(response.data.data.documents);
+				} else {
+					setBooks([]);
+				}
+			})
+			.catch((e) => console.log(e))
+			.finally(() => {
+				setLoaded(false);
+				setIsBooksLoading(false);
+			});
 	};
 
 	const handleNewBook = () => {
@@ -68,7 +76,21 @@ function Books() {
 							New Book
 						</Button>
 					</HStack>
-					<Box mt={8}>
+					<Box
+						mt={8}
+						w={"full"}
+					>
+						{isBooksLoading && (
+							<Center>
+								<Spinner
+									thickness="4px"
+									speed="1s"
+									emptyColor="gray.200"
+									color={themeColor}
+									size="xl"
+								/>
+							</Center>
+						)}
 						{books && books.length > 0 && (
 							<List>
 								{books.map((book, index) => (

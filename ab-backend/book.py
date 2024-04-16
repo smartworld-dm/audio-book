@@ -22,7 +22,7 @@ def create_book(email):
     else:
         return {"success": False, "message": "MongoDB API error"}
     
-def save_book(_id, title, email, sections):
+def save_book(_id, title, email, sections, characters):
     filter = {
         "_id": {"$oid": _id},
         "email": email
@@ -36,6 +36,7 @@ def save_book(_id, title, email, sections):
             "$set": {
                 "sections": sections,
                 "title": title,
+                "characters": characters
             }
         }
     }, headers)
@@ -66,7 +67,6 @@ def get_books(email):
         return {"success": True, "message": "Get books successfully", "data": data}
     else:
         return {"success": False, "message": "MongoDB API error"}
-
 
 def get_book(_id, email):
     filter = {

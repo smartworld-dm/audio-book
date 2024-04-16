@@ -39,6 +39,7 @@ const BookContextProvider = ({ children }) => {
 		setCurrentBookIdx("");
 		setCurrentBookTitle("");
 		setSections([]);
+		setCharacters([]);
 	};
 
 	const onOpenBook = (book) => {
@@ -56,7 +57,15 @@ const BookContextProvider = ({ children }) => {
 							isClosable: true,
 						});
 						setCurrentBookIdx(response.data.data._id);
-						setSections(JSON.parse(response.data.data.sections));
+						try {
+							const sectiondata = JSON.parse(response.data.data.sections);
+							setSections(sectiondata);
+						} catch {}
+
+						try {
+							const characterdata = JSON.parse(response.data.data.characters);
+							setCharacters(characterdata);
+						} catch {}
 						setCurrentBookTitle(response.data.data.title);
 						navigate("/edit");
 					} else {
@@ -87,6 +96,7 @@ const BookContextProvider = ({ children }) => {
 					id: currentBookIdx,
 					title: currentBookTitle,
 					sections: JSON.stringify(sections),
+					characters: JSON.stringify(characters)
 				})
 				.then((response) => {
 					if (response.data.success) {
@@ -125,7 +135,6 @@ const BookContextProvider = ({ children }) => {
 				})
 				.then((response) => {
 					if (response.data.success) {
-						console.log(response.data);
 						setCurrentBookIdx(response.data.data);
 						setCurrentBookTitle("Untitled");
 
