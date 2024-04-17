@@ -14,7 +14,6 @@ import React, { createContext, useContext, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { EditContext } from "./EditContextProvider";
 export const BookContext = createContext();
 const apiUrl = process.env.REACT_APP_API_URL;
 const BookContextProvider = ({ children }) => {
@@ -24,7 +23,7 @@ const BookContextProvider = ({ children }) => {
 	const [characters, setCharacters] = useState([]);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [isLoading, setIsLoading] = useState(false);
-	const { user } = useContext(AuthContext);
+	const { cookieAlive } = useContext(AuthContext);
 	const toast = useToast();
 	const navigate = useNavigate();
 
@@ -47,7 +46,7 @@ const BookContextProvider = ({ children }) => {
 		try {
 			setIsLoading(true);
 			axios
-				.get(`${apiUrl}book?user=${user.email}&id=${book._id}`)
+				.get(`${apiUrl}book?user=${cookieAlive()}&id=${book._id}`)
 				.then((response) => {
 					if (response.data.success) {
 						toast({
@@ -95,7 +94,7 @@ const BookContextProvider = ({ children }) => {
 			setIsLoading(true);
 			axios
 				.post(`${apiUrl}save_book`, {
-					email: user.email,
+					email: cookieAlive(),
 					id: currentBookIdx,
 					title: currentBookTitle,
 					sections: JSON.stringify(sections),
@@ -134,7 +133,7 @@ const BookContextProvider = ({ children }) => {
 			setIsLoading(true);
 			axios
 				.post(`${apiUrl}create_book`, {
-					email: user.email,
+					email: cookieAlive(),
 				})
 				.then((response) => {
 					if (response.data.success) {
@@ -169,7 +168,7 @@ const BookContextProvider = ({ children }) => {
 	};
 
 	const onLoadBooks = async () => {
-		return axios.get(`${apiUrl}books?user=${user.email}`);
+		return axios.get(`${apiUrl}books?user=${cookieAlive()}`);
 	};
 
 	const getCurrentSectionTitle = (sectionId)=> {

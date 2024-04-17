@@ -9,11 +9,11 @@ import EditContextProvider from "../providers/EditContextProvider";
 
 function Edit() {
 	const themeColor = useColorModeValue("orange.400", "orange.300");
-	const { user } = useContext(AuthContext);
+	const { user, cookieAlive } = useContext(AuthContext);
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (!user) {
+		if (!cookieAlive()) {
 			navigate("/login");
 		}
 	}, []);

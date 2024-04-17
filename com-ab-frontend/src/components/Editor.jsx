@@ -10,31 +10,21 @@ import {
 } from "@chakra-ui/react";
 import React, {
 	useEffect,
-	useState,
-	useRef,
-	useCallback,
 	useContext,
 } from "react";
 import ReactQuill from "react-quill";
-import CanvasUtils from "../utils/CanvasColorUtil";
 import { BookContext } from "../providers/BookContextProvider";
 import { EditContext } from "../providers/EditContextProvider";
-
+const audioUrl = process.env.REACT_APP_AUDIO_URL;
 function Editor() {
 	const {
 		currentSectionId,
-		setCurrentSectionId,
-		onInsertTag,
 		quillRef,
 		reactQuillRef,
 		canvasRef,
-		defaultCanvasHeight,
 		setDefaultCanvasHeight,
-		defaultCanvasWidth,
 		setDefaultCanvasWidth,
-		canvasCtx,
 		setCanvasCtx,
-		range,
 		setRange,
 	} = useContext(EditContext);
 	const {
@@ -45,7 +35,8 @@ function Editor() {
 		setSections,
 		onSaveBook,
 		isLoading,
-		onGenerateSectionAudio
+		onGenerateSectionAudio,
+		currentBookIdx
 	} = useContext(BookContext);
 
 	useEffect(() => {
@@ -94,8 +85,28 @@ function Editor() {
 		onSaveBook();
 	};
 
+	const handleDownloadAudio = () => {
+		const section = sections[currentSectionId];
+		if (section && section.audio) {
+			const link = document.createElement("a");
+			// link.href = section.audio;
+			const url = `${audioUrl}${currentBookIdx}/${section.audio}`;
+			console.log(url)
+			link.href = url;
+			// link.setAttribute(
+			// 	"download",
+			// 	`${url}`
+			// ); // or any other extension
+			document.body.appendChild(link);
+			link.click();
+			link.parentNode.removeChild(link);
+		} else {
+			alert("No audio file available for this section.");
+		}
+	};
+
 	const handleGenerate = () => {
-		onGenerateSectionAudio(currentSectionId, 'full');
+		onGenerateSectionAudio(currentSectionId, "full");
 	};
 
 	return (
@@ -108,16 +119,16 @@ function Editor() {
 				align={"start"}
 			>
 				<HStack gap={4}>
-				<Input
-					placeholder="Enter your book title here"
-					border={"none"}
-					fontSize={18}
-					id="book-title"
-					defaultValue={currentBookTitle}
-					onChange={(e) => setCurrentBookTitle(e.target.value)}
-				/>
+					<Input
+						placeholder="Enter your book title here"
+						border={"none"}
+						fontSize={18}
+						id="book-title"
+						defaultValue={currentBookTitle}
+						onChange={(e) => setCurrentBookTitle(e.target.value)}
+					/>
 				</HStack>
-				
+
 				<Text>{getCurrentSectionTitle(currentSectionId)}</Text>
 				<Box w={"full"}>
 					<ReactQuill
@@ -144,25 +155,26 @@ function Editor() {
 						colorScheme="blue"
 						onClick={handleGenerate}
 						size={"sm"}
+						isLoading={isLoading}
 					>
 						Generate Section Audio
 					</Button>
 					<Button
 						colorScheme="yellow"
-						onClick={handleSaveBook}
+						onClick={handleDownloadAudio}
 						size={"sm"}
 						isLoading={isLoading}
 					>
 						Download Section Audio
 					</Button>
-					<Button
+					{/* <Button
 						colorScheme="yellow"
 						onClick={handleSaveBook}
 						size={"sm"}
 						isLoading={isLoading}
 					>
 						Download Book Audio
-					</Button>
+					</Button> */}
 				</ButtonGroup>
 				<canvas
 					ref={canvasRef}

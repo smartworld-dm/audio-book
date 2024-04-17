@@ -13,6 +13,7 @@ import {
 	ModalOverlay,
 	ModalFooter,
 	Spacer,
+	Text
 } from "@chakra-ui/react";
 import { BookContext } from "../providers/BookContextProvider";
 
@@ -22,6 +23,7 @@ import { EditContext } from "../providers/EditContextProvider";
 function Sections() {
 	const fileInputRef = React.useRef(null);
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const { isOpen: isRemoveOpen, onOpen: onRemoveOpen, onClose: onRemoveClose } = useDisclosure();
 	const [newSectionTitle, setNewSectionTitle] = useState("");
 	const { sections, setSections } =
 		useContext(BookContext);
@@ -48,6 +50,16 @@ function Sections() {
 		setSections(newSections);
 		onClose();
 	};
+
+	const onRemoveSection = ()=> {
+		const newSections = [...sections];
+		newSections.splice(currentSectionId, 1);
+		setCurrentSectionId(currentSectionId - 1);
+		setSections(newSections);
+		
+		onRemoveClose();
+		
+	}
 
 	const handleOpenFile = () => {
 		fileInputRef.current.click();
@@ -93,6 +105,7 @@ function Sections() {
 									id={index}
 									section={section}
 									onSelect={handleSelectSection}
+									onRemove={onRemoveOpen}
 									current={currentSectionId}
 								/>
 							))}
@@ -156,6 +169,30 @@ function Sections() {
 						</Button>
 						<Spacer />
 						<Button onClick={onClose}>Close</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+			<Modal
+				onClose={onRemoveClose}
+				isOpen={isRemoveOpen}
+				isCentered
+			>
+				<ModalOverlay />
+				<ModalContent>
+					<ModalHeader>Remove Section</ModalHeader>
+					<ModalCloseButton />
+					<ModalBody>
+						<Text>Are you sure you want to remove this section?</Text>
+					</ModalBody>
+					<ModalFooter>
+						<Button
+							colorScheme="orange"
+							onClick={onRemoveSection}
+						>
+							Remove
+						</Button>
+						<Spacer />
+						<Button onClick={onRemoveClose}>Close</Button>
 					</ModalFooter>
 				</ModalContent>
 			</Modal>

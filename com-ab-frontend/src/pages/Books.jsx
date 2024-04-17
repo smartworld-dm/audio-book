@@ -23,7 +23,7 @@ function Books() {
 	const [isBooksLoading, setIsBooksLoading] = useState(false);
 	const [loaded, setLoaded] = useState(false);
 	const [books, setBooks] = useState([]);
-	const { user } = useContext(AuthContext);
+	const { user, cookieAlive } = useContext(AuthContext);
 
 	const loadBooks = () => {
 		setIsBooksLoading(true);
@@ -46,13 +46,13 @@ function Books() {
 
 	const handleNewBook = () => {
 		onReset();
-		if (user && user.email) {
+		if (cookieAlive()) {
 			onNewBook();
 		} else navigate("/login");
 	};
 
 	useEffect(() => {
-		if (!user) navigate("/login");
+		if (!cookieAlive()) navigate("/login");
 		else {
 			if (!loaded) loadBooks();
 		}

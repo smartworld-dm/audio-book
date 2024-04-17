@@ -38,11 +38,6 @@ def register():
     except Exception as e:
         return {"success": False, "message": f'API error {str(e)}'}
 
-@app.route("/api/voices", methods=['GET'])
-def voices():
-    voices = elevenlab.getVoices()
-    return {"success": True, "voices": voices}
-
 @app.route("/api/create_book", methods=['POST'])
 def create_book():
     try:
@@ -81,7 +76,13 @@ def get_book():
         return book.get_book(_id, user_email)
     except Exception as e:
         return {"success": False, "message": f'API error {str(e)}'}
-    
+
+
+@app.route("/api/voices", methods=['GET'])
+def voices():
+    voices = elevenlab.getVoices()
+    return {"success": True, "voices": voices}
+
 @app.route("/api/audio/generate", methods=['POST'])
 def generate():
     try:

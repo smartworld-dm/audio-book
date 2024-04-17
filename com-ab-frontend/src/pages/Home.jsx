@@ -6,11 +6,12 @@ import { useContext } from "react";
 import { AuthContext } from "../providers/AuthProvider";
 import { BookContext } from "../providers/BookContextProvider";
 function Home() {
-	const { user } = useContext(AuthContext);
+	const { user, cookieAlive } = useContext(AuthContext);
 	const { onNewBook, isLoading } = useContext(BookContext);
 	const navigate = useNavigate();
+	
 	const handleNewBook = () => {
-		if (user && user.email) {
+		if (cookieAlive()){
 			onNewBook();
 		} else navigate("/login");
 	};

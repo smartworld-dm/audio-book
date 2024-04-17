@@ -74,7 +74,7 @@ function Login() {
 					duration: 3000,
 					isClosable: true,
 				});
-                login({email})
+                login({email, token: response.data.token})
 			} else {
 				toast({
 					title: 'Login Error',

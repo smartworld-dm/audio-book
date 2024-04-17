@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
 	Card,
 	CardHeader,
@@ -8,12 +8,18 @@ import {
 	Spacer,
 	IconButton,
 	useColorModeValue,
-	Button,
 } from "@chakra-ui/react";
-import { FaEdit, FaPlay, FaPlayCircle, FaSave, FaStop } from "react-icons/fa";
+import {
+	FaEdit,
+	FaPlayCircle,
+	FaSave,
+	FaStop,
+	FaTrash,
+} from "react-icons/fa";
 import { BookContext } from "../providers/BookContextProvider";
 const audioUrl = process.env.REACT_APP_AUDIO_URL;
 function SectionItem(props) {
+
 	const { sections, setSections, currentBookIdx } = useContext(BookContext);
 	const [modifyTitle, setModifyTitle] = useState("");
 	const [isModifyingTitle, setIsModifyingTitle] = useState(false);
@@ -29,6 +35,7 @@ function SectionItem(props) {
 	};
 
 	const onEditTitle = () => {
+		console.log(modifyTitle)
 		const newSections = [...sections];
 		newSections[sectionId] = {
 			...newSections[sectionId],
@@ -38,6 +45,7 @@ function SectionItem(props) {
 	};
 
 	const handleModifyTitle = () => {
+		setModifyTitle(section.title);
 		setIsModifyingTitle(true);
 	};
 
@@ -46,13 +54,13 @@ function SectionItem(props) {
 		let audio;
 		try {
 			audio = new Audio(url);
-			audio.onended = ()=> {
+			audio.onended = () => {
 				setIsPlayingAudio(false);
-				console.log("Ended")
-			}
+				console.log("Ended");
+			};
 
 			setSectionAudio(audio);
-			
+
 			if (!isPlayingAudio) {
 				sectionAudio.play();
 				setIsPlayingAudio(true);
@@ -61,7 +69,7 @@ function SectionItem(props) {
 				setIsPlayingAudio(false);
 			}
 		} catch (e) {
-			console.log(e)
+			console.log(e);
 		}
 	};
 
@@ -119,8 +127,15 @@ function SectionItem(props) {
 							onClick={handlePlayAudio}
 						/>
 					)}
+					<IconButton
+						size={"sm"}
+						colorScheme="red"
+						icon={<FaTrash />}
+						onClick={props.onRemove}
+					/>
 				</HStack>
 			</CardHeader>
+			
 		</Card>
 	);
 }

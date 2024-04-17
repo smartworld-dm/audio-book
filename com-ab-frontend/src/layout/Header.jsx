@@ -24,12 +24,21 @@ function Header() {
 	const themeColor = useColorModeValue("orange.400", "orange.300");
 	const theme2Color = useColorModeValue("orange.500", "orange.200");
 	const profileColor = useColorModeValue("gray.100", "blue.900");
-	const { user, logout } = useContext(AuthContext);
+	const { logout, cookieAlive } = useContext(AuthContext);
+	
 	const navigate = useNavigate();
 
 	const handleLogin = () => {
 		navigate("/login");
 	};
+
+	const userName = ()=>{
+		if (cookieAlive()){
+			return cookieAlive().toUpperCase()[0];
+		} else {
+			return "";
+		}
+	}
 
 	return (
 		<Box
@@ -66,7 +75,7 @@ function Header() {
 							My Books
 						</Text>
 					</ChakraLink>
-					{!user && (
+					{!cookieAlive() && (
 						<Button
 							leftIcon={userIcon}
 							size={"sm"}
@@ -77,7 +86,7 @@ function Header() {
 						</Button>
 					)}
 
-					{user && user.email ? (
+					{cookieAlive() ? (
 						<Box>
 							<HStack>
 								<Circle
@@ -88,7 +97,7 @@ function Header() {
 									borderColor={themeColor}
 								>
 									{/* <Image src={commune} /> */}
-									<Text fontWeight={700} fontSize={20} color={profileColor}>{user.email.toUpperCase()[0]}</Text>
+									<Text fontWeight={700} fontSize={20} color={profileColor}>{userName()}</Text>
 								</Circle>
 								<Button colorScheme="orange" variant={'ghost'} onClick={()=>logout()}>Log out</Button>
 							</HStack>

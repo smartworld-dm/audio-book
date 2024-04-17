@@ -180,4 +180,4 @@ def generate(_id, section_id, section, characters, last_character, action ):
                 Path(dir_path).joinpath(success_chunk_file).write_text(str(chunk_idx))
 
             time.sleep(1)
-    return { "success": True, "message": "Successfully generated the audio.", "audio" : filename }
+    return { "success": True, "message": "Successfully generated the audio", "audio" : filename }

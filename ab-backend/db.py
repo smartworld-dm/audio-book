@@ -21,3 +21,9 @@ books = {
     "database": "audio-book",
     "dataSource": "Cluster0"
 }
+
+sessions = {
+    "collection" : "sessions",
+    "database": "audio-book",
+    "dataSource": "Cluster0"
+}
