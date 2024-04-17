@@ -92,7 +92,7 @@ function Books() {
 								/>
 							</Center>
 						)}
-						{books && books.length > 0 && (
+						{!isBooksLoading && books && books.length > 0 && (
 							<List>
 								{books.map((book, index) => (
 									<BookItem
