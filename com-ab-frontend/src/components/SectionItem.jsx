@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import {
 	Card,
 	CardHeader,
@@ -8,14 +8,17 @@ import {
 	Spacer,
 	IconButton,
 	useColorModeValue,
+	Button,
 } from "@chakra-ui/react";
-import { FaEdit, FaSave } from "react-icons/fa";
+import { FaEdit, FaPlay, FaPlayCircle, FaSave, FaStop } from "react-icons/fa";
 import { BookContext } from "../providers/BookContextProvider";
-
+const audioUrl = process.env.REACT_APP_AUDIO_URL;
 function SectionItem(props) {
-	const { sections, setSections } = useContext(BookContext);
+	const { sections, setSections, currentBookIdx } = useContext(BookContext);
 	const [modifyTitle, setModifyTitle] = useState("");
 	const [isModifyingTitle, setIsModifyingTitle] = useState(false);
+	const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+	const [sectionAudio, setSectionAudio] = useState(null);
 	const section = props.section;
 	const themeColor = useColorModeValue("blue.400", "orange.300");
 	const profileColor = useColorModeValue("gray.400", "blue.900");
@@ -38,6 +41,30 @@ function SectionItem(props) {
 		setIsModifyingTitle(true);
 	};
 
+	const handlePlayAudio = () => {
+		const url = `${audioUrl}${currentBookIdx}/${section.audio}`;
+		let audio;
+		try {
+			audio = new Audio(url);
+			audio.onended = ()=> {
+				setIsPlayingAudio(false);
+				console.log("Ended")
+			}
+
+			setSectionAudio(audio);
+			
+			if (!isPlayingAudio) {
+				sectionAudio.play();
+				setIsPlayingAudio(true);
+			} else {
+				sectionAudio.pause();
+				setIsPlayingAudio(false);
+			}
+		} catch (e) {
+			console.log(e)
+		}
+	};
+
 	return (
 		<Card
 			w={"full"}
@@ -46,9 +73,9 @@ function SectionItem(props) {
 			<CardHeader
 				bg={currentSectionId === sectionId ? profileColor : {}}
 				borderRadius={"lg"}
-				border={ currentSectionId === sectionId ? "1px" : "0px"}
+				border={currentSectionId === sectionId ? "1px" : "0px"}
 			>
-				<HStack gap={4}>
+				<HStack gap={2}>
 					{!isModifyingTitle && (
 						<Text
 							color={themeColor}
@@ -66,7 +93,6 @@ function SectionItem(props) {
 						/>
 					)}
 					<Spacer />
-
 					{!isModifyingTitle && (
 						<IconButton
 							size={"sm"}
@@ -84,11 +110,15 @@ function SectionItem(props) {
 							}}
 						/>
 					)}
-
-					{/* <IconButton
-						size={"sm"}
-						icon={<FaBookOpen />}
-					/> */}
+					{section.audio && section.audio.length > 0 && (
+						<IconButton
+							size={"sm"}
+							icon={
+								!isPlayingAudio ? <FaPlayCircle /> : <FaStop />
+							}
+							onClick={handlePlayAudio}
+						/>
+					)}
 				</HStack>
 			</CardHeader>
 		</Card>

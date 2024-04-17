@@ -23,7 +23,7 @@ function Sections() {
 	const fileInputRef = React.useRef(null);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [newSectionTitle, setNewSectionTitle] = useState("");
-	const { sections, setSections, onSaveBook, isLoading } =
+	const { sections, setSections } =
 		useContext(BookContext);
 
 	const {currentSectionId, setCurrentSectionId} = useContext(EditContext);
@@ -37,6 +37,7 @@ function Sections() {
 		if (newSectionTitle.length !== 0) {
 			newSections.push({
 				title: newSectionTitle,
+				audio: ''
 			});
 		} else {
 			newSections[currentSectionId] = {
@@ -66,10 +67,7 @@ function Sections() {
 		reader.readAsText(file);
 	};
 
-	const handleSaveBook = () => {
-		onSaveBook();
-	};
-
+	
 	const handleSelectSection = (_sectionId) => {
 		setCurrentSectionId(_sectionId);
 	};
@@ -107,15 +105,7 @@ function Sections() {
 							Create New Section
 						</Button>
 
-						<Button
-							colorScheme="green"
-							onClick={handleSaveBook}
-							w={"full"}
-							mt={8}
-							isLoading={isLoading}
-						>
-							Save Book
-						</Button>
+						
 					</VStack>
 				) : (
 					<VStack w={"full"}>

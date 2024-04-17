@@ -14,10 +14,11 @@ import React, { createContext, useContext, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { EditContext } from "./EditContextProvider";
 export const BookContext = createContext();
 const apiUrl = process.env.REACT_APP_API_URL;
 const BookContextProvider = ({ children }) => {
-	const [currentBookIdx, setCurrentBookIdx] = useState(); // Currently Editing book idx
+	const [currentBookIdx, setCurrentBookIdx] = useState(""); // Currently Editing book idx
 	const [currentBookTitle, setCurrentBookTitle] = useState(""); // Currently Editing Book Title
 	const [sections, setSections] = useState([]); // Currently Editing book sections
 	const [characters, setCharacters] = useState([]);
@@ -56,6 +57,7 @@ const BookContextProvider = ({ children }) => {
 							duration: 3000,
 							isClosable: true,
 						});
+						console.log(response.data)
 						setCurrentBookIdx(response.data.data._id);
 						try {
 							const sectiondata = JSON.parse(response.data.data.sections);
@@ -67,6 +69,7 @@ const BookContextProvider = ({ children }) => {
 							setCharacters(characterdata);
 						} catch {}
 						setCurrentBookTitle(response.data.data.title);
+
 						navigate("/edit");
 					} else {
 						toast({
@@ -177,10 +180,77 @@ const BookContextProvider = ({ children }) => {
 		return "";
 	}
 
+	const findLastCharacter = (sectionId)=>{
+		let result = 0;
+
+        if (sections.length > 1){
+            for(let idx = sectionId - 1; idx >= 0; idx--){
+                let ops = sections[idx].content['ops'];
+                for(let i = ops.length - 1; i >= 0; i --){
+                    const op = ops[i];
+                    if (op.hasOwnProperty('attributes') && op['insert'].hasOwnProperty('customImage')){
+                        if (op['insert']['customImage'].hasOwnProperty('character'))
+                        {
+                            result = op['insert']['customImage']['character'];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+	}
+
+	const onGenerateSectionAudio = (sectionId, action)=>{
+		try {
+			setIsLoading(true);
+			axios
+				.post(`${apiUrl}audio/generate`, {
+					'section_id': sectionId,
+					'section': JSON.stringify(sections[sectionId]),
+					'characters': JSON.stringify(characters),
+					'last_character': findLastCharacter(sectionId),
+					'_id': currentBookIdx,
+					'action': action
+				})
+				.then((response) => {
+					if (response.data.success) {
+						toast({
+							title: "Generate Section Audio",
+							description: `${response.data.message}. Please don't forget to save your book.`,
+							status: "success",
+							duration: 3000,
+							isClosable: true,
+						});
+						const newSections = [...sections];
+						newSections[sectionId]['audio'] = response.data.audio;
+						console.log(newSections)
+						setSections(newSections);
+					} else {
+						toast({
+							title: "Generate Section Audio",
+							description: `${response.data.message}.`,
+							status: "error",
+							duration: 3000,
+							isClosable: true,
+						});
+					}
+				})
+				.catch((e) => console.log(e))
+				.finally(() => {
+					setIsLoading(false);
+				});
+		} catch {
+			setIsLoading(false);
+		}
+	}
+
 	return (
 		<BookContext.Provider
 			value={{
 				isLoading,
+				currentBookIdx,
 				setCurrentBookIdx,
 				sections,
 				setSections,
@@ -196,6 +266,7 @@ const BookContextProvider = ({ children }) => {
 				onNewBook,
 				onOpenBook,
 				onLoadBooks,
+				onGenerateSectionAudio,
 
 				getCurrentSectionTitle
 			}}

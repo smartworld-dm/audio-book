@@ -1,4 +1,13 @@
-import { Box, VStack, Input, Text, Button } from "@chakra-ui/react";
+import {
+	Box,
+	VStack,
+	Input,
+	Text,
+	Button,
+	HStack,
+	Spacer,
+	ButtonGroup,
+} from "@chakra-ui/react";
 import React, {
 	useEffect,
 	useState,
@@ -10,7 +19,6 @@ import ReactQuill from "react-quill";
 import CanvasUtils from "../utils/CanvasColorUtil";
 import { BookContext } from "../providers/BookContextProvider";
 import { EditContext } from "../providers/EditContextProvider";
-
 
 function Editor() {
 	const {
@@ -26,7 +34,8 @@ function Editor() {
 		setDefaultCanvasWidth,
 		canvasCtx,
 		setCanvasCtx,
-		range, setRange
+		range,
+		setRange,
 	} = useContext(EditContext);
 	const {
 		currentBookTitle,
@@ -34,6 +43,9 @@ function Editor() {
 		getCurrentSectionTitle,
 		sections,
 		setSections,
+		onSaveBook,
+		isLoading,
+		onGenerateSectionAudio
 	} = useContext(BookContext);
 
 	useEffect(() => {
@@ -68,20 +80,23 @@ function Editor() {
 		console.log();
 		if (!quillRef.current.selection.lastRange)
 			setRange(quillRef.current.selection.savedRange);
-		else
-			setRange(quillRef.current.selection.lastRange);
+		else setRange(quillRef.current.selection.lastRange);
 	};
 
 	useEffect(() => {
 		if (sections.length > 0) {
 			const section = sections[currentSectionId];
-			quillRef.current.setContents(section['content']);
+			quillRef.current.setContents(section["content"]);
 		}
 	}, [currentSectionId]);
 
-	useEffect(()=>{
+	const handleSaveBook = () => {
+		onSaveBook();
+	};
 
-	}, []);
+	const handleGenerate = () => {
+		onGenerateSectionAudio(currentSectionId, 'full');
+	};
 
 	return (
 		<Box
@@ -92,6 +107,7 @@ function Editor() {
 				gap={4}
 				align={"start"}
 			>
+				<HStack gap={4}>
 				<Input
 					placeholder="Enter your book title here"
 					border={"none"}
@@ -100,6 +116,8 @@ function Editor() {
 					defaultValue={currentBookTitle}
 					onChange={(e) => setCurrentBookTitle(e.target.value)}
 				/>
+				</HStack>
+				
 				<Text>{getCurrentSectionTitle(currentSectionId)}</Text>
 				<Box w={"full"}>
 					<ReactQuill
@@ -111,6 +129,41 @@ function Editor() {
 						onChangeSelection={handleChangeSelection}
 					/>
 				</Box>
+				<ButtonGroup w={"full"}>
+					<Button
+						colorScheme="green"
+						onClick={handleSaveBook}
+						size={"sm"}
+						isLoading={isLoading}
+					>
+						Save Book
+					</Button>
+
+					<Spacer />
+					<Button
+						colorScheme="blue"
+						onClick={handleGenerate}
+						size={"sm"}
+					>
+						Generate Section Audio
+					</Button>
+					<Button
+						colorScheme="yellow"
+						onClick={handleSaveBook}
+						size={"sm"}
+						isLoading={isLoading}
+					>
+						Download Section Audio
+					</Button>
+					<Button
+						colorScheme="yellow"
+						onClick={handleSaveBook}
+						size={"sm"}
+						isLoading={isLoading}
+					>
+						Download Book Audio
+					</Button>
+				</ButtonGroup>
 				<canvas
 					ref={canvasRef}
 					id="tagCanvas"

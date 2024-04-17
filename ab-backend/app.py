@@ -1,6 +1,8 @@
+import json
 from flask import Flask
 from flask import request
 from flask_cors import CORS
+from flask import send_from_directory
 import hashlib
 import user
 import elevenlab
@@ -75,7 +77,33 @@ def get_books():
 def get_book():
     try:
         user_email = request.args.get('user')
-        _id = request.args.get('id');
+        _id = request.args.get('id')
         return book.get_book(_id, user_email)
     except Exception as e:
         return {"success": False, "message": f'API error {str(e)}'}
+    
+@app.route("/api/audio/generate", methods=['POST'])
+def generate():
+    try:
+        data = request.json
+        print(data)
+        _id = data.get("_id")
+        section_id = data.get("section_id")
+        section = data.get("section")
+        section_json = json.loads(section)
+        characters = data.get("characters")
+        characters_json = json.loads(characters)
+        last_character = data.get("last_character")
+        action = data.get("action")
+        return elevenlab.generate(_id, section_id, section_json, characters_json, last_character, action )
+    except Exception as e:
+        return {"success": False, "message": f'API error {str(e)}'}
+    
+@app.route('/audio/<path:filename>')
+def audio(filename):
+    try:
+        return send_from_directory('audio', filename)
+    except FileNotFoundError:
+        return {"success": False, "message": "File not found"}, 404
+    except Exception as e:
+        return {"success": False, "message": f"An error occurred: {str(e)}"}, 500
