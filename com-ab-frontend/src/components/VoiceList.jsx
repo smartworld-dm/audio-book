@@ -123,6 +123,7 @@ function VoiceList() {
 				voice_id: voice.voice_id,
 				voice_name: voice.name,
 				voice_url: voice.preview_url,
+				tag_color: genRandomColor(),
 			};
 			setCharacters(newCharacters);
 			onVoiceClose();

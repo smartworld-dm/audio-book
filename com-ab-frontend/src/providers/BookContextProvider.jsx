@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 export const BookContext = createContext();
 const apiUrl = process.env.REACT_APP_API_URL;
 const BookContextProvider = ({ children }) => {
+	const [books, setBooks] = useState([]);
 	const [currentBookIdx, setCurrentBookIdx] = useState(""); // Currently Editing book idx
 	const [currentBookTitle, setCurrentBookTitle] = useState(""); // Currently Editing Book Title
 	const [sections, setSections] = useState([]); // Currently Editing book sections
@@ -88,6 +89,45 @@ const BookContextProvider = ({ children }) => {
 			setIsLoading(false);
 		}
 	};
+
+	const onRemoveBook = (book)=> {
+		try {
+			setIsLoading(true);
+			axios
+				.post(`${apiUrl}remove_book`, {
+					id: book._id,
+				})
+				.then((response) => {
+					if (response.data.success) {
+						toast({
+							title: "Remove Book",
+							description: `${response.data.message}.`,
+							status: "success",
+							duration: 3000,
+							isClosable: true,
+						});
+
+						const newBooks = books.filter(b=> book._id !== b._id );
+						setBooks(newBooks);
+
+					} else {
+						toast({
+							title: "Remove Book",
+							description: `${response.data.message}.`,
+							status: "error",
+							duration: 3000,
+							isClosable: true,
+						});
+					}
+				})
+				.catch((e) => console.log(e))
+				.finally(() => {
+					setIsLoading(false);
+				});
+		} catch {
+			setIsLoading(false);
+		}
+	}
 
 	const onSaveBook = () => {
 		try {
@@ -171,6 +211,14 @@ const BookContextProvider = ({ children }) => {
 		return axios.get(`${apiUrl}books?user=${cookieAlive()}`);
 	};
 
+	const onLoadAudio = (url)=> {
+		return axios({
+			url: url,
+			method: 'GET',
+			responseType: 'blob'
+		});
+	}
+
 	const getCurrentSectionTitle = (sectionId)=> {
 		if (sections.length > 0) {
 			return sections[sectionId]['title']
@@ -249,6 +297,8 @@ const BookContextProvider = ({ children }) => {
 		<BookContext.Provider
 			value={{
 				isLoading,
+				books,
+				setBooks, 
 				currentBookIdx,
 				setCurrentBookIdx,
 				sections,
@@ -262,10 +312,12 @@ const BookContextProvider = ({ children }) => {
 				onLoaded,
 				onReset,
 				onSaveBook,
+				onRemoveBook,
 				onNewBook,
 				onOpenBook,
 				onLoadBooks,
 				onGenerateSectionAudio,
+				onLoadAudio,
 
 				getCurrentSectionTitle
 			}}

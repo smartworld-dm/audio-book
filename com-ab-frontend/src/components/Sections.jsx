@@ -61,23 +61,23 @@ function Sections() {
 		
 	}
 
-	const handleOpenFile = () => {
-		fileInputRef.current.click();
-	};
+	// const handleOpenFile = () => {
+	// 	fileInputRef.current.click();
+	// };
 
-	const processFileLoad = (e) => {
-		const file = fileInputRef.current.files[0];
+	// const processFileLoad = (e) => {
+	// 	const file = fileInputRef.current.files[0];
 
-		if (file.type !== "text/plain") {
-			alert("Please select a text file.");
-			return;
-		}
-		const reader = new FileReader();
-		reader.onload = async (e) => {
-			// const content = e.target.result;
-		};
-		reader.readAsText(file);
-	};
+	// 	if (file.type !== "text/plain") {
+	// 		alert("Please select a text file.");
+	// 		return;
+	// 	}
+	// 	const reader = new FileReader();
+	// 	reader.onload = async (e) => {
+	// 		// const content = e.target.result;
+	// 	};
+	// 	reader.readAsText(file);
+	// };
 
 	
 	const handleSelectSection = (_sectionId) => {
@@ -129,21 +129,21 @@ function Sections() {
 						>
 							Create New Section
 						</Button>
-						<Button
+						{/* <Button
 							colorScheme="orange"
 							onClick={handleOpenFile}
 							w={"full"}
 						>
 							Load From File
-						</Button>
+						</Button> */}
 					</VStack>
 				)}
-				<Input
+				{/* <Input
 					type="file"
 					ref={fileInputRef}
 					visibility={"hidden"}
 					onChange={processFileLoad}
-				/>
+				/> */}
 			</VStack>
 			<Modal
 				onClose={onClose}

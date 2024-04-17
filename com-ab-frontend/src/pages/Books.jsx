@@ -9,6 +9,7 @@ import {
 	Button,
 	Spinner,
 	Center,
+	Heading,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@chakra-ui/react";
 import BookItem from "../components/BookItem";
@@ -17,12 +18,12 @@ import { AuthContext } from "../providers/AuthProvider";
 import { BookContext } from "../providers/BookContextProvider";
 function Books() {
 	const themeColor = useColorModeValue("orange.400", "orange.300");
-	const { onNewBook, onLoadBooks, onReset, isLoading } =
+	const { books, setBooks, onNewBook, onLoadBooks, onReset, isLoading } =
 		useContext(BookContext);
 	const navigate = useNavigate();
 	const [isBooksLoading, setIsBooksLoading] = useState(false);
 	const [loaded, setLoaded] = useState(false);
-	const [books, setBooks] = useState([]);
+	
 	const { user, cookieAlive } = useContext(AuthContext);
 
 	const loadBooks = () => {
@@ -100,6 +101,9 @@ function Books() {
 									/>
 								))}
 							</List>
+						)}
+						{!isBooksLoading && books && books.length === 0 && (
+							<Heading>You haven't created any book.</Heading>
 						)}
 					</Box>
 				</Box>

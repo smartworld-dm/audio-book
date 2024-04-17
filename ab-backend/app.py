@@ -2,7 +2,7 @@ import json
 from flask import Flask
 from flask import request
 from flask_cors import CORS
-from flask import send_from_directory
+from flask import send_from_directory, send_file
 import hashlib
 import user
 import elevenlab
@@ -12,6 +12,7 @@ app = Flask(__name__)
 
 # CORS(app)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors = CORS(app, resources={r"/audio/*": {"origins": "*"}})
 
 @app.route("/")
 def index():
@@ -44,6 +45,15 @@ def create_book():
         data = request.json
         email = data.get('email')
         return book.create_book(email)
+    except Exception as e:
+        return {"success": False, "message": f'API error {str(e)}'}
+    
+@app.route("/api/remove_book", methods=['POST'])
+def remove_book():
+    try:
+        data = request.json
+        _id = data.get('id')
+        return book.remove_book(_id)
     except Exception as e:
         return {"success": False, "message": f'API error {str(e)}'}
     
@@ -100,10 +110,10 @@ def generate():
     except Exception as e:
         return {"success": False, "message": f'API error {str(e)}'}
     
-@app.route('/audio/<path:filename>')
-def audio(filename):
+@app.route('/audio/<path:dirname>/<path:filename>')
+def audio(dirname, filename):
     try:
-        return send_from_directory('audio', filename)
+        return send_from_directory(f'audio/{dirname}', filename)
     except FileNotFoundError:
         return {"success": False, "message": "File not found"}, 404
     except Exception as e:

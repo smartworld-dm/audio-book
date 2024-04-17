@@ -46,6 +46,22 @@ def save_book(_id, title, email, sections, characters):
     else:
         return {"success": False, "message": "MongoDB API error"}
     
+def remove_book(_id):
+    filter = {
+        "_id": {"$oid": _id},
+    }
+    response = request_curl(api["url"]+"/action/deleteOne", {
+        "collection": books["collection"],
+        "database": books["database"],
+        "dataSource": books["dataSource"],
+        "filter": filter,
+    }, headers)
+    if response_status(response.status_code):
+        data = response.json()
+        return {"success": True, "message": "Removed successfully"}
+    else:
+        return {"success": False, "message": "MongoDB API error"}
+    
 def get_books(email):
     filter = {
         "email": email

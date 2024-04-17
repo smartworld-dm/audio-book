@@ -8,10 +8,7 @@ import {
 	Spacer,
 	ButtonGroup,
 } from "@chakra-ui/react";
-import React, {
-	useEffect,
-	useContext,
-} from "react";
+import React, { useEffect, useContext } from "react";
 import ReactQuill from "react-quill";
 import { BookContext } from "../providers/BookContextProvider";
 import { EditContext } from "../providers/EditContextProvider";
@@ -36,7 +33,8 @@ function Editor() {
 		onSaveBook,
 		isLoading,
 		onGenerateSectionAudio,
-		currentBookIdx
+		currentBookIdx,
+		onLoadAudio,
 	} = useContext(BookContext);
 
 	useEffect(() => {
@@ -91,15 +89,29 @@ function Editor() {
 			const link = document.createElement("a");
 			// link.href = section.audio;
 			const url = `${audioUrl}${currentBookIdx}/${section.audio}`;
-			console.log(url)
-			link.href = url;
-			// link.setAttribute(
-			// 	"download",
-			// 	`${url}`
-			// ); // or any other extension
-			document.body.appendChild(link);
-			link.click();
-			link.parentNode.removeChild(link);
+			onLoadAudio(url).then((response) => {
+				console.log(response);
+				try {
+					// console.log(response)
+					if (response) {
+						const downloadUrl = window.URL.createObjectURL(response.data);
+						link.href = downloadUrl;
+						link.download = `${currentBookTitle}-${section.title}.mp3`;
+						// link.target = "_blank";
+						// document.body.appendChild(link);
+						link.click();
+						// link.parentNode.removeChild(link);
+						setTimeout(() => {
+							window.URL.revokeObjectURL(downloadUrl);
+						}, 100);
+					}
+					// console.log(url);
+
+					
+				} catch (e) {
+					console.log(e);
+				}
+			});
 		} else {
 			alert("No audio file available for this section.");
 		}
