@@ -46,9 +46,9 @@ const CanvasUtils = {
         const fontsize = 18;
         ctx.font = fontsize + "px Lato";
         const textMetrics = ctx.measureText(tag);
-        const lineHeight = Math.ceil(
-            textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent
-        );
+        // const lineHeight = Math.ceil(
+        //     textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent
+        // );
         const lineWidth = Math.ceil(textMetrics.width);
         const scaleFactor = lineWidth / canvasWidth;
 
