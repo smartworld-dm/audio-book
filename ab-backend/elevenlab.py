@@ -35,7 +35,6 @@ def process_section(section, last_character):
     result = []
     last_chunk = ""
     chunk_buffer = ""
-    print(section)
     ops_count = len(section['content']['ops'])
     chunk_size = 1500
 
